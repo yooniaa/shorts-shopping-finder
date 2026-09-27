@@ -74,6 +74,13 @@ dialog{border:none;border-radius:14px;padding:20px 22px;width:min(660px,94vw);bo
  <p class="hint">키는 이 브라우저에만 저장됩니다.</p>
  <label><span>YouTube Data API v3 키 — <a href="https://console.cloud.google.com/apis/library/youtube.googleapis.com" target="_blank">발급하기</a> (무료)</span><input id="kYt" type="password" placeholder="AIza..."></label>
  <label><span>Apify 토큰 (TikTok/Instagram/Douyin) — <a href="https://console.apify.com/settings/integrations" target="_blank">발급하기</a> (매달 $5 무료)</span><input id="kAp" type="password" placeholder="apify_api_..."></label>
+ <div class="row">
+  <label><span>Apify 1회 실행 최대 비용 ($)</span><input id="maxUsd" type="number" step="0.05" min="0.05" style="width:120px"></label>
+  <label class="c"><input type="checkbox" id="igF"> Instagram 팔로워 수도 조회 (추가 비용)</label></div>
+ <details><summary class="hint" style="cursor:pointer">고급: 사용할 Apify 도구 바꾸기</summary>
+  <p class="hint">Apify 스토어의 도구 이름(예: <code>username/actor-name</code>)을 넣으면 됩니다. 비워두면 기본값을 씁니다. 입력 이름은 도구의 입력 형식을 읽어서 자동으로 맞춥니다. 필요하면 추가 입력(JSON)을 넣을 수 있습니다.</p>
+  <div id="actorRows"></div>
+ </details>
  <div class="row" style="justify-content:flex-end"><button value="x">취소</button><button id="bSave" class="pri" value="ok">저장</button></div>
 </form></dialog>
 <dialog id="dDet"><div id="det"></div><form method="dialog" class="row" style="justify-content:flex-end;margin-top:12px"><button class="pri">닫기</button></form></dialog>
@@ -81,15 +88,21 @@ dialog{border:none;border-radius:14px;padding:20px 22px;width:min(660px,94vw);bo
 <script>
 'use strict';
 // ===================== 설정: TikTok/Instagram/Douyin 수집에 쓰는 Apify 도구 =====================
-const APIFY = {
-  tiktok:    { search:  ['clockworks/tiktok-scraper', v => ({ searchQueries:[v.q], resultsPerPage:v.limit, searchSection:'/video', shouldDownloadVideos:false, shouldDownloadCovers:false, shouldDownloadSubtitles:false, shouldDownloadSlideshowImages:false })],
-               comments:['clockworks/tiktok-comments-scraper', v => ({ postURLs:v.urls, commentsPerPost:v.cpv, maxRepliesPerComment:0 })] },
-  instagram: { search:  ['apify/instagram-hashtag-scraper', v => ({ hashtags:[v.tag], resultsLimit:v.limit, resultsType:'reels' })],
-               comments:['apify/instagram-comment-scraper', v => ({ directUrls:v.urls, resultsLimit:v.cpv })],
-               profiles:['apify/instagram-profile-scraper', v => ({ usernames:v.users })] },
-  douyin:    { search:  ['zen-studio/douyin-search-scraper', v => ({ keywords:[v.q], maxResults:v.limit })],
-               comments:['zen-studio/douyin-comments-scraper', v => ({ videoUrls:v.urls, maxComments:v.cpv })] },
+// 저렴한 도구 위주 (가격은 2026-09 Apify 스토어 표기 기준 대략값, 1,000건당 $). ⚙️ 설정에서 도구를 바꿀 수 있습니다.
+const APIFY_DEFAULT = {
+  'tiktok.search':      { actor: 'xmolodtsov/tiktok-search-scraper',          price: 0.20 },
+  'tiktok.comments':    { actor: 'dami_studio/tiktok-comments-scraper',       price: 0.25 },
+  'instagram.search':   { actor: 'steadyfetch/instagram-hashtag-scraper',     price: 0.60 },
+  'instagram.comments': { actor: 'scrapersdelight/instagram-comments-scraper', price: 0.30 },
+  'instagram.profiles': { actor: 'apify/instagram-profile-scraper',           price: null },
+  'douyin.search':      { actor: 'zen-studio/douyin-search-scraper',          price: null },
+  'douyin.comments':    { actor: 'zen-studio/douyin-comments-scraper',        price: null },
 };
+const ROLE_NAME = { 'tiktok.search':'TikTok 검색', 'tiktok.comments':'TikTok 댓글', 'instagram.search':'Instagram 해시태그', 'instagram.comments':'Instagram 댓글',
+  'instagram.profiles':'Instagram 팔로워', 'douyin.search':'Douyin 검색', 'douyin.comments':'Douyin 댓글' };
+function apifyConf() { let c = {}; try { c = JSON.parse(localStorage.getItem('ssf.actors') || '{}'); } catch {}
+  const out = {}; for (const [k, d] of Object.entries(APIFY_DEFAULT)) { const u = c[k] || {}, actor = (u.actor || '').trim() || d.actor;
+    out[k] = { actor, extra: u.extra || '', price: actor === d.actor ? d.price : null }; } return out; }
 const PRESETS = {
   ko:['어디서 사','어디서 샀','어디서 구매','어디서 파','어디꺼','어디 제품','제품명','제품 정보','정보 좀','정보좀','링크','구매','구입','사고 싶','사고싶','살 수 있','파는 곳','파는곳','얼마','가격','브랜드','쿠팡','품절','재입고','판매처','공구'],
   zh:['哪里买','在哪买','哪买','链接','求链接','多少钱','同款','怎么买','想买','求购','店铺','橱窗'],
@@ -171,56 +184,120 @@ async function searchYouTube(o, key) {
 }
 
 // ===================== TikTok / Instagram / Douyin (Apify) =====================
-async function runActor(actor, input, token) {
+const API = 'https://api.apify.com/v2/';
+async function apifyGet(path, token) {
+  const u = new URL(API + path); u.searchParams.set('token', token);
+  const r = await fetch(u); if (!r.ok) throw new Error('HTTP ' + r.status); return (await r.json()).data;
+}
+// 도구의 입력 형식(스키마)을 Apify에서 읽어옴 → 도구마다 다른 입력 이름을 자동으로 맞춤
+async function getSchema(actor, token) {
+  const ck = 'ssf.schema.' + actor;
+  try { const c = JSON.parse(localStorage.getItem(ck) || 'null'); if (c && Date.now() - c.t < 7 * 864e5) return c.s; } catch {}
+  let s = null;
+  try { const b = await apifyGet(`acts/${actor.replace('/', '~')}/builds/default`, token);
+    s = b?.actorDefinition?.input || (typeof b?.inputSchema === 'string' ? JSON.parse(b.inputSchema) : b?.inputSchema) || null; } catch {}
+  if (!s?.properties) try { const a = await apifyGet(`acts/${actor.replace('/', '~')}`, token);
+    let ex = a?.exampleRunInput?.body; if (typeof ex === 'string') ex = JSON.parse(ex);
+    if (ex && typeof ex === 'object') { s = { properties: {}, required: [] }; for (const [k, v] of Object.entries(ex)) s.properties[k] = { type: Array.isArray(v) ? 'array' : Number.isInteger(v) ? 'integer' : typeof v, prefill: v }; }
+  } catch {}
+  if (s?.properties) localStorage.setItem(ck, JSON.stringify({ t: Date.now(), s }));
+  return s;
+}
+const clamp = (n, p) => Math.max(p?.minimum ?? -Infinity, Math.min(p?.maximum ?? Infinity, n));
+function autoInput(schema, role, v) {
+  const P = schema?.properties || {}, out = {}, kind = role.split('.')[1], useTag = role === 'instagram.search';
+  for (const k of schema?.required || []) { const p = P[k] || {}; if (p.default !== undefined) out[k] = p.default; else if (p.prefill !== undefined) out[k] = p.prefill; }
+  const hit = { q: false, n: false, u: false };
+  for (const [k, p] of Object.entries(P)) {
+    const n = k.toLowerCase(), t = p.type || (Array.isArray(p.prefill) ? 'array' : typeof p.prefill);
+    const objItems = p.editor === 'requestListSources' || (Array.isArray(p.prefill) && typeof p.prefill[0] === 'object') || p.items?.type === 'object';
+    if (t === 'boolean' && /(download|cover|subtitle|transcript|repl|slideshow|image|media)/.test(n)) { out[k] = false; continue; }
+    if (p.enum && /(type|tab|section|content|kind|mode)/.test(n) && !/(sort|order)/.test(n)) { const e = p.enum.find(x => /reel|video/i.test(x)); if (e !== undefined) out[k] = e; continue; }
+    if (kind === 'search') {
+      if (/(quer|keyword|search|term|hashtag|^tags?$|^q$|^text$)/.test(n) && !/(url|user|profile|sort|section|type|lang|region|country|mode|limit|max|page|date|suggest|expan)/.test(n) && (t === 'array' || t === 'string')) {
+        const val = useTag || /(hashtag|tag)/.test(n) ? v.tag : v.q; out[k] = t === 'array' ? [val] : val; hit.q = true; continue; }
+      if ((t === 'integer' || t === 'number') && /(max|limit|results|count|amount|number|items|per)/.test(n) && !/(comment|repl|concurren|retr|timeout|memory|day|age|min|scroll|charge|usd|page$|pages)/.test(n)) { out[k] = clamp(v.limit, p); hit.n = true; }
+    } else if (kind === 'comments') {
+      if (t === 'array' && /(url|link|post|video|input|start|direct|source|id|shortcode|media)/.test(n) && !/(proxy|exclude|user|profile)/.test(n)) { out[k] = objItems ? v.urls.map(url => ({ url })) : v.urls; hit.u = true; continue; }
+      if ((t === 'integer' || t === 'number') && /(max|limit|count|per|results|comment|number|items)/.test(n) && !/(repl|concurren|retr|timeout|memory|day|age|min|charge|usd|page)/.test(n)) { out[k] = clamp(/total/.test(n) ? v.cpv * v.urls.length : v.cpv, p); hit.n = true; }
+    } else if (kind === 'profiles') {
+      if (t === 'array' && /(user|name|handle|profile|account)/.test(n)) { out[k] = /url/.test(n) ? v.users.map(u => `https://www.instagram.com/${u}/`) : v.users; hit.u = true; }
+    }
+  }
+  // 스키마를 못 읽었거나 이름을 못 찾았으면 흔히 쓰는 이름들을 같이 보냄
+  if (kind === 'search' && !hit.q) { const val = useTag ? v.tag : v.q; Object.assign(out, { searchQueries:[val], queries:[val], keywords:[val], keyword:val, query:val, search:val, hashtags:[v.tag] }); }
+  if (kind === 'search' && !hit.n) Object.assign(out, { maxItems:v.limit, maxResults:v.limit, resultsPerPage:v.limit, resultsLimit:v.limit, limit:v.limit });
+  if (kind === 'comments' && !hit.u) Object.assign(out, { postURLs:v.urls, postUrls:v.urls, urls:v.urls, videoUrls:v.urls, directUrls:v.urls, startUrls:v.urls.map(url => ({ url })) });
+  if (kind === 'comments' && !hit.n) Object.assign(out, { commentsPerPost:v.cpv, maxComments:v.cpv, maxCommentsPerPost:v.cpv, resultsLimit:v.cpv, maxItems:v.cpv * v.urls.length });
+  if (kind === 'profiles' && !hit.u) Object.assign(out, { usernames:v.users, profiles:v.users });
+  return out;
+}
+async function runActor(role, v, token, o) {
   if (!token) throw new Error('Apify 토큰이 없습니다. 오른쪽 위 ⚙️ API 키 설정에서 입력하세요.');
-  const u = new URL(`https://api.apify.com/v2/acts/${actor.replace('/', '~')}/run-sync-get-dataset-items`);
-  u.search = new URLSearchParams({ timeout: '280', clean: 'true', format: 'json', token });
-  const r = await fetch(u, { method:'POST', headers:{ 'content-type':'application/json' }, body:JSON.stringify(input) });
+  const c = apifyConf()[role], actor = c.actor.trim();
+  let input = autoInput(await getSchema(actor, token), role, v);
+  if (c.extra) try { Object.assign(input, JSON.parse(c.extra)); } catch { throw new Error(`${ROLE_NAME[role]} 추가 입력(JSON) 형식이 잘못됐습니다.`); }
+  const maxItems = role.endsWith('.search') ? v.limit : role.endsWith('.comments') ? v.cpv * v.urls.length : v.users.length;
+  const u = new URL(`${API}acts/${actor.replace('/', '~')}/run-sync-get-dataset-items`);
+  u.search = new URLSearchParams({ timeout: '280', clean: 'true', format: 'json', token, maxItems: String(maxItems), maxTotalChargeUsd: String(o.maxUsd || 0.5) });
+  const r = await fetch(u, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(input) });
   const t = await r.text();
-  if (!r.ok) { let m = t; try { m = JSON.parse(t).error.message; } catch {} throw new Error(`Apify(${actor}) 오류 ${r.status}: ${String(m).slice(0, 300)}`); }
-  const d = JSON.parse(t || '[]'); return Array.isArray(d) ? d : [];
+  if (!r.ok) { let m = t; try { m = JSON.parse(t).error.message; } catch {}
+    throw new Error(`${ROLE_NAME[role]} (${actor}) 오류 ${r.status}: ${String(m).slice(0, 300)} ▶ 보낸 입력: ${JSON.stringify(input).slice(0, 400)}`); }
+  const d = JSON.parse(t || '[]');
+  if (c.price != null && Array.isArray(d)) o.cost.push(Math.min(d.length, maxItems) * c.price / 1000);
+  return Array.isArray(d) ? d : [];
 }
 const NORM = {
-  tiktok: x => { const id = String(pick(x,'id','aweme_id') || ''), u = pick(x,'authorMeta.name','author.uniqueId') || '';
-    return { platform:'tiktok', id, url:pick(x,'webVideoUrl','url') || `https://www.tiktok.com/@${u}/video/${id}`, title:pick(x,'text','desc') || '',
-      thumbnail:pick(x,'videoMeta.coverUrl','covers.default','cover') || '', channelName:pick(x,'authorMeta.nickName','author.nickname') || u, channelUrl:u ? `https://www.tiktok.com/@${u}` : '',
-      followers:num(x,'authorMeta.fans','author.followerCount','authorStats.followerCount'), publishedAt:iso(pick(x,'createTimeISO','createTime')), durationSec:num(x,'videoMeta.duration','video.duration'),
-      views:num(x,'playCount','stats.playCount'), likes:num(x,'diggCount','stats.diggCount'), comments:num(x,'commentCount','stats.commentCount') }; },
-  instagram: x => { const sc = pick(x,'shortCode','code') || '', u = pick(x,'ownerUsername','owner.username') || '';
-    return { platform:'instagram', id:String(pick(x,'id') || sc), sc, url:pick(x,'url') || `https://www.instagram.com/reel/${sc}/`, title:pick(x,'caption') || '',
-      thumbnail:pick(x,'displayUrl') || '', channelName:u, channelUrl:u ? `https://www.instagram.com/${u}/` : '', followers:num(x,'ownerFollowersCount'),
-      publishedAt:iso(pick(x,'timestamp')), durationSec:num(x,'videoDuration'), views:num(x,'videoPlayCount','videoViewCount','playCount'),
-      likes:num(x,'likesCount','likeCount'), comments:num(x,'commentsCount','commentCount'), _t:pick(x,'type','productType') }; },
-  douyin: x => { const id = String(pick(x,'aweme_id','awemeId','id','videoId') || ''), su = pick(x,'author.sec_uid','author.secUid'); let d = num(x,'video.duration','duration'); if (d > 1000) d = Math.round(d / 1000);
-    const it = { platform:'douyin', id, url:pick(x,'share_url','shareUrl','url','videoUrl') || `https://www.douyin.com/video/${id}`, title:pick(x,'desc','description','title','text') || '',
-      thumbnail:pick(x,'video.cover.url_list.0','cover','coverUrl','cover_url') || '', channelName:pick(x,'author.nickname','authorName','nickname') || '', channelUrl:su ? `https://www.douyin.com/user/${su}` : '',
-      followers:num(x,'author.follower_count','author.followerCount','authorFollowers'), publishedAt:iso(pick(x,'create_time','createTime','createTimeISO','publishTime')), durationSec:d,
-      views:num(x,'statistics.play_count','playCount','viewCount'), likes:num(x,'statistics.digg_count','diggCount','likeCount','likes'), comments:num(x,'statistics.comment_count','commentCount','comments') };
+  tiktok: x => { const id = String(pick(x,'id','aweme_id','videoId','video_id','awemeId') || ''), u = pick(x,'authorMeta.name','author.uniqueId','author.unique_id','author.username','author.handle','authorUsername','username','channel.username') || '';
+    return { platform:'tiktok', id, url:pick(x,'webVideoUrl','url','videoUrl','video_url','link','shareUrl') || `https://www.tiktok.com/@${u}/video/${id}`, title:pick(x,'text','desc','description','caption','title') || '',
+      thumbnail:pick(x,'videoMeta.coverUrl','covers.default','cover','coverUrl','thumbnail','video.cover') || '', channelName:pick(x,'authorMeta.nickName','author.nickname','author.name','authorName','channel.name') || u, channelUrl:u ? `https://www.tiktok.com/@${u}` : '',
+      followers:num(x,'authorMeta.fans','author.followerCount','authorStats.followerCount','author.followers','author.fans','channel.followers','authorFollowers','followerCount'),
+      publishedAt:iso(pick(x,'createTimeISO','createTime','create_time','createdAt','created_at','timestamp','publishedAt','uploadedAt')), durationSec:num(x,'videoMeta.duration','video.duration','duration'),
+      views:num(x,'playCount','stats.playCount','statistics.play_count','views','viewCount','plays'), likes:num(x,'diggCount','stats.diggCount','statistics.digg_count','likes','likeCount'),
+      comments:num(x,'commentCount','stats.commentCount','statistics.comment_count','comments','commentsCount'), shares:num(x,'shareCount','stats.shareCount','shares') }; },
+  instagram: x => { const sc = pick(x,'shortCode','shortcode','code') || '', u = pick(x,'ownerUsername','owner.username','user.username','author.username','username','author') || '';
+    return { platform:'instagram', id:String(pick(x,'id','pk','postId') || sc), sc, url:pick(x,'url','postUrl','permalink','link') || `https://www.instagram.com/reel/${sc}/`, title:pick(x,'caption.text','caption','text','description') || '',
+      thumbnail:pick(x,'displayUrl','display_url','thumbnailUrl','thumbnail_url','image_versions2.candidates.0.url','thumbnail','images.0') || '', channelName:typeof u === 'string' ? u : '', channelUrl:typeof u === 'string' && u ? `https://www.instagram.com/${u}/` : '',
+      followers:num(x,'ownerFollowersCount','owner.followersCount','owner.follower_count','user.follower_count','author.followers','followers'),
+      publishedAt:iso(pick(x,'timestamp','takenAt','taken_at','taken_at_timestamp','createdAt','date')), durationSec:num(x,'videoDuration','video_duration','duration'),
+      views:num(x,'videoPlayCount','videoViewCount','playCount','play_count','video_view_count','viewCount','views','plays'),
+      likes:num(x,'likesCount','likeCount','like_count','likes'), comments:num(x,'commentsCount','commentCount','comment_count','comments'), _t:pick(x,'type','productType','media_type','mediaType') }; },
+  douyin: x => { const id = String(pick(x,'aweme_id','awemeId','id','videoId','video_id') || ''), su = pick(x,'author.sec_uid','author.secUid','authorSecUid'); let d = num(x,'video.duration','duration','durationSec'); if (d > 1000) d = Math.round(d / 1000);
+    const it = { platform:'douyin', id, url:pick(x,'share_url','shareUrl','url','videoUrl','webVideoUrl') || `https://www.douyin.com/video/${id}`, title:pick(x,'desc','description','title','text','caption') || '',
+      thumbnail:pick(x,'video.cover.url_list.0','video.origin_cover.url_list.0','cover','coverUrl','cover_url','thumbnail') || '', channelName:pick(x,'author.nickname','authorName','author.name','nickname') || '', channelUrl:su ? `https://www.douyin.com/user/${su}` : '',
+      followers:num(x,'author.follower_count','author.followerCount','authorFollowers','author.fans','followerCount'), publishedAt:iso(pick(x,'create_time','createTime','createTimeISO','publishTime','publishedAt')), durationSec:d,
+      views:num(x,'statistics.play_count','playCount','viewCount','stats.playCount'), likes:num(x,'statistics.digg_count','diggCount','likeCount','likes','stats.diggCount'),
+      comments:num(x,'statistics.comment_count','commentCount','comments','stats.commentCount'), shares:num(x,'statistics.share_count','shareCount','shares') };
     if (it.views === 0 && it.likes > 0) it.views = null; return it; },
 };
-const normC = x => ({ text:pick(x,'text','comment','content') || '', likes:num(x,'diggCount','likesCount','likeCount','digg_count') || 0, author:pick(x,'uniqueId','ownerUsername','user.nickname','nickname','username') || '' });
-function ownerKey(x) {
-  const d = pick(x,'aweme_id','awemeId','videoId','postId','shortCode'); if (d) return String(d);
-  const s = JSON.stringify([x.videoWebUrl, x.postUrl, x.inputUrl, x.url, x.videoUrl, x.input]);
-  const m = s.match(/\/(?:p|reel|reels|tv)\/([A-Za-z0-9_-]+)/) || s.match(/\/video\/(\d+)/); return m ? m[1] : null;
-}
+const normC = x => ({ text:String(pick(x,'text','comment','content','commentText','body','message') || ''), likes:num(x,'diggCount','likesCount','likeCount','digg_count','like_count','likes') || 0,
+  author:String(pick(x,'uniqueId','ownerUsername','user.unique_id','user.nickname','user.username','author.username','author.nickname','authorName','nickname','username','owner.username') || '') });
 async function searchApify(pf, o, token) {
-  const C = APIFY[pf], v = { q:o.q, tag:o.q.replace(/[#\s]+/g, ''), limit:o.limit, cpv:o.cpv }, seen = new Set();
-  let items = (await runActor(C.search[0], C.search[1](v), token)).filter(x => !x.error).map(NORM[pf]).filter(i => i.id && !seen.has(i.id) && seen.add(i.id));
+  const v = { q:o.q, tag:o.q.replace(/[#\s]+/g, ''), limit:o.limit, cpv:o.cpv }, seen = new Set();
+  let items = (await runActor(pf + '.search', v, token, o)).filter(x => x && !x.error && !x.errorDescription).map(NORM[pf]).filter(i => i.id && !seen.has(i.id) && seen.add(i.id));
   if (o.days) items = items.filter(i => !i.publishedAt || new Date(i.publishedAt) >= Date.now() - o.days * 864e5);
-  if (o.short && pf === 'instagram') items = items.filter(i => !i._t || /video|reel|clips/i.test(i._t));
+  if (o.short && pf === 'instagram') items = items.filter(i => !i._t || /^2$|video|reel|clip/i.test(String(i._t)));
   items = items.slice(0, o.limit);
-  if (pf === 'instagram' && items.length) {
-    try { const users = [...new Set(items.map(i => i.channelName).filter(Boolean))].slice(0, 100), mp = {};
-      for (const p of await runActor(C.profiles[0], C.profiles[1]({ users }), token)) mp[p.username] = num(p,'followersCount');
-      items.forEach(i => { if (mp[i.channelName] != null) i.followers = mp[i.channelName]; }); } catch (e) { o.warn.push('인스타 팔로워 조회 실패: ' + e.message); }
+  const need = [...new Set(items.filter(i => i.followers == null && i.channelName).map(i => i.channelName))].slice(0, 100);
+  if (pf === 'instagram' && o.igFollowers && need.length) {
+    try { const mp = {};
+      for (const p of await runActor('instagram.profiles', { ...v, users: need }, token, o)) mp[String(pick(p,'username','user.username') || '').toLowerCase()] = num(p,'followersCount','follower_count','followers','edge_followed_by.count');
+      items.forEach(i => { const f = mp[i.channelName.toLowerCase()]; if (i.followers == null && f != null) i.followers = f; }); } catch (e) { o.warn.push('인스타 팔로워 조회 실패: ' + e.message); }
   }
   const cm = {};
   if (o.scan && o.kws.length) {
     const tg = items.filter(i => i.url && i.comments !== 0);
     if (tg.length) try {
-      const k2 = {}; for (const t of tg) { cm[t.id] = []; k2[t.id] = t.id; if (t.sc) k2[t.sc] = t.id; const m = t.url.match(/\/video\/(\d+)/) || t.url.match(/\/(?:p|reel|reels|tv)\/([A-Za-z0-9_-]+)/); if (m) k2[m[1]] = t.id; }
-      for (const c of await runActor(C.comments[0], C.comments[1]({ ...v, urls:tg.map(t => t.url) }), token)) { const id = k2[ownerKey(c)] || (tg.length === 1 ? tg[0].id : null); if (id) cm[id].push(normC(c)); }
+      const keys = tg.map(t => { const m = t.url.match(/\/video\/(\d+)/) || t.url.match(/\/(?:p|reel|reels|tv)\/([A-Za-z0-9_-]+)/); return [t.id, [t.id, t.sc, m && m[1]].filter(k => k && String(k).length >= 5)]; });
+      tg.forEach(t => cm[t.id] = []);
+      for (const c of await runActor(pf + '.comments', { ...v, urls: tg.map(t => t.url) }, token, o)) {
+        if (!c || c.error) continue;
+        let id = null;
+        if (tg.length === 1) id = tg[0].id;
+        else { const s = JSON.stringify(c); const f = keys.find(([, ks]) => ks.some(k => s.includes(k))); id = f && f[0]; }
+        if (id) { const n = normC(c); if (n.text) cm[id].push(n); }
+      }
     } catch (e) { o.warn.push(`${PF[pf]} 댓글 수집 실패: ${e.message}`); }
   }
   return items.map(({ _t, sc, ...i }) => finalize(i, cm[i.id] ?? null, o.kws));
@@ -262,12 +339,13 @@ async function search() {
   const yk = localStorage.getItem('ssf.yt') || '', ak = localStorage.getItem('ssf.ap') || '', isDemo = $('#demo').checked;
   $('#st').innerHTML = ''; S.items = []; render(); $('#bGo').disabled = true;
   await Promise.all(pfs.map(async pf => {
-    const t0 = Date.now(), o = { ...base, warn: [] };
+    const t0 = Date.now(), o = { ...base, warn: [], cost: [], maxUsd: +(localStorage.getItem('ssf.maxUsd') || 0.5), igFollowers: localStorage.getItem('ssf.igF') !== '0' };
     msg(pf, '', `⏳ <b>${PF[pf]}</b> 수집 중…${pf !== 'youtube' && !isDemo ? ' (1~5분 걸릴 수 있어요)' : ''}`);
     try {
       const r = isDemo ? demo(pf, o) : pf === 'youtube' ? await searchYouTube(o, yk) : await searchApify(pf, o, ak);
       S.items.push(...r); render();
-      msg(pf, o.warn.length ? 'warn' : 'ok', `✅ <b>${PF[pf]}</b> ${r.length}개 영상 · 구매의도 댓글 있는 영상 ${r.filter(i => i.matchCount).length}개 (${((Date.now() - t0) / 1000).toFixed(1)}초)` + o.warn.map(w => '<br>⚠️ ' + esc(w)).join(''));
+      const cost = o.cost.length ? ` · 예상 비용 약 $${o.cost.reduce((a, b) => a + b, 0).toFixed(3)}` : '';
+      msg(pf, o.warn.length ? 'warn' : 'ok', `✅ <b>${PF[pf]}</b> ${r.length}개 영상 · 구매의도 댓글 있는 영상 ${r.filter(i => i.matchCount).length}개 (${((Date.now() - t0) / 1000).toFixed(1)}초${cost})` + o.warn.map(w => '<br>⚠️ ' + esc(w)).join(''));
     } catch (e) {
       const hint = e instanceof TypeError ? ' — 인터넷 연결 또는 키를 확인하세요.' : '';
       msg(pf, 'err', `❌ <b>${PF[pf]}</b>: ${esc(e.message)}${hint}`);
@@ -336,8 +414,19 @@ $$('th[data-k]').forEach(th => th.onclick = () => { const k = th.dataset.k; if (
 ['#fT','#fV','#fF','#fX','#fI','#fS'].forEach(s => $(s).oninput = render);
 $('#tb').onclick = e => { if (!e.target.closest('[data-d]')) return; const id = e.target.closest('tr').dataset.id, i = S.items.find(x => x.platform + ':' + x.id === id); if (i && i.commentsScanned != null) detail(i); };
 $('#bCsv').onclick = csv;
-$('#bSet').onclick = () => { $('#kYt').value = localStorage.getItem('ssf.yt') || ''; $('#kAp').value = localStorage.getItem('ssf.ap') || ''; $('#dSet').showModal(); };
-$('#bSave').onclick = () => { localStorage.setItem('ssf.yt', $('#kYt').value.trim()); localStorage.setItem('ssf.ap', $('#kAp').value.trim()); };
+$('#bSet').onclick = () => {
+  $('#kYt').value = localStorage.getItem('ssf.yt') || ''; $('#kAp').value = localStorage.getItem('ssf.ap') || '';
+  $('#maxUsd').value = localStorage.getItem('ssf.maxUsd') || '0.5'; $('#igF').checked = localStorage.getItem('ssf.igF') !== '0';
+  let saved = {}; try { saved = JSON.parse(localStorage.getItem('ssf.actors') || '{}'); } catch {}
+  $('#actorRows').innerHTML = Object.entries(APIFY_DEFAULT).map(([k, d]) => `<div class="row" data-role="${k}">
+    <label style="flex:1"><span>${ROLE_NAME[k]} ${d.price != null ? `(기본: 1,000건당 약 $${d.price})` : ''}</span><input class="aA" placeholder="${esc(d.actor)}" value="${esc(saved[k]?.actor || '')}"></label>
+    <label style="flex:1"><span>추가 입력(JSON, 선택)</span><input class="aX" placeholder='{"예시": 1}' value="${esc(saved[k]?.extra || '')}"></label></div>`).join('');
+  $('#dSet').showModal(); };
+$('#bSave').onclick = () => {
+  localStorage.setItem('ssf.yt', $('#kYt').value.trim()); localStorage.setItem('ssf.ap', $('#kAp').value.trim());
+  localStorage.setItem('ssf.maxUsd', String(Math.max(0.05, +$('#maxUsd').value || 0.5))); localStorage.setItem('ssf.igF', $('#igF').checked ? '1' : '0');
+  const a = {}; $$('#actorRows [data-role]').forEach(r => { const actor = r.querySelector('.aA').value.trim(), extra = r.querySelector('.aX').value.trim(); if (actor || extra) a[r.dataset.role] = { actor, extra }; });
+  localStorage.setItem('ssf.actors', JSON.stringify(a)); };
 load();
 </script>
 </body>
