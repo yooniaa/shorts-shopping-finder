@@ -3,11 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>숏폼 쇼핑 파인더</title>
+<title>숏폼 쇼핑 스튜디오</title>
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:"Malgun Gothic","Apple SD Gothic Neo",sans-serif;background:#f4f5f8;color:#1d2130;font-size:14px}
-header{display:flex;align-items:center;gap:14px;padding:14px 24px;background:#1d2130;color:#fff;flex-wrap:wrap}header h1{margin:0;font-size:20px}header span{color:#aeb4c6;font-size:13px}
-main{padding:18px 24px 60px;max-width:1800px;margin:0 auto}.card{background:#fff;border:1px solid #e3e5ea;border-radius:12px;padding:16px 18px;margin-bottom:14px}
+.card{background:#fff;border:1px solid #e3e5ea;border-radius:12px;padding:16px 18px;margin-bottom:14px}
 .row{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:10px}.grow{flex:1;min-width:260px}.sp{flex:1}
 label{display:flex;flex-direction:column;gap:4px}label>span,.lbl{font-size:12px;color:#6b7185;font-weight:600}label.c{flex-direction:row;align-items:center;gap:6px;cursor:pointer;padding-bottom:6px}
 input,select,textarea{font:inherit;padding:8px 10px;border:1px solid #e3e5ea;border-radius:8px;background:#fff}textarea{width:100%;resize:vertical}
@@ -24,11 +23,64 @@ th.on{color:#ff4d6d}.n{text-align:right;white-space:nowrap}td.w{min-width:280px;
 .th{width:54px;height:86px;object-fit:cover;border-radius:6px;background:#eee}.it{font-weight:800;color:#ff4d6d;cursor:pointer;text-decoration:underline dotted}.it.z{color:#bbb;font-weight:400;cursor:default;text-decoration:none}.hot{color:#d9480f;font-weight:800}
 dialog{border:none;border-radius:14px;padding:20px 22px;width:min(660px,94vw);box-shadow:0 20px 60px rgba(0,0,0,.25)}dialog label{margin-bottom:12px}
 .cm{padding:8px 10px;border-bottom:1px solid #e3e5ea}.cms{max-height:55vh;overflow:auto;border:1px solid #e3e5ea;border-radius:8px}mark{background:#ffe066}
+.app{display:flex;min-height:100vh}
+nav#nav{width:230px;flex:none;background:#1d2130;color:#fff;padding:16px 12px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:4px;overflow:auto}
+nav .brand{font-weight:800;font-size:17px;padding:4px 8px 14px}
+nav a{display:flex;align-items:center;gap:9px;padding:11px 10px;border-radius:10px;color:#cfd3e0;cursor:pointer;text-decoration:none;font-size:15px;user-select:none}
+nav a:hover{background:#2a3044}nav a.on{background:#ff4d6d;color:#fff;font-weight:700}
+nav a b{display:inline-flex;width:22px;height:22px;flex:none;border-radius:50%;background:#3a4158;align-items:center;justify-content:center;font-size:12px}
+nav a i{margin-left:auto;font-style:normal;color:#6ee7a0;font-weight:800}
+nav .flow{color:#6b7185;font-size:11px;padding:0 10px 0 41px;line-height:1}
+.navfoot{margin-top:auto;display:flex;flex-direction:column;gap:8px;padding-top:12px}.navfoot button{background:#2a3044;color:#fff;border-color:#3a4158}.navfoot .hint{color:#aeb4c6}
+main{flex:1;min-width:0;padding:18px 24px 60px}
+.page{display:none}.page.on{display:block}
+h2.pt{margin:0 0 12px;font-size:21px}h2.pt small{font-weight:400;font-size:13px;margin-left:6px}
+label.btn{display:inline-flex;flex-direction:row;align-items:center;cursor:pointer;border:1px solid #e3e5ea;border-radius:8px;padding:8px 14px;background:#fff;font-weight:600}
+label.btn.pri{background:#ff4d6d;color:#fff;border-color:#ff4d6d}
+.sm{padding:4px 8px;font-size:12px;margin:1px}label.btn.sm{padding:4px 8px;font-size:12px}
+table.sc th{position:static;cursor:default}table.sc textarea{min-height:64px;font-size:13px}
+.prog{height:8px;background:#eee;border-radius:4px;overflow:hidden}.prog>div{height:100%;background:#ff4d6d;width:0}
+.pcard{display:flex;gap:12px;align-items:flex-start;background:#f8f9fb;border-radius:10px;padding:10px 12px;margin-bottom:12px}.pcard a{color:#1d2130}
+#vCanvas{width:100%;aspect-ratio:9/16;background:#000;border-radius:10px;display:block}
+.mth{width:60px;height:96px;object-fit:cover;border-radius:6px;background:#eee;display:block;margin-bottom:4px}
+#kText{font-size:13px;line-height:1.6}
+@media(max-width:860px){.app{flex-direction:column}nav#nav{width:auto;height:auto;position:static;flex-direction:row;flex-wrap:wrap}nav .flow{display:none}.navfoot{margin:0;flex-direction:row}}
 </style>
 </head>
 <body>
-<header><h1>🛍️ 숏폼 쇼핑 파인더</h1><span>YouTube · TikTok · Instagram · Douyin 인기영상 + "어디서 사요?" 댓글 분석</span><span class="sp"></span><button id="bSet">⚙️ API 키 설정</button></header>
+<div class="app">
+<nav id="nav">
+ <div class="brand">🛍️ 숏폼 쇼핑 스튜디오</div>
+ <a data-go="know"><b>0</b>📚 노하우 학습<i id="s-know"></i></a>
+ <a data-go="find"><b>1</b>🔍 쇼핑 상품 찾기<i id="s-find"></i></a>
+ <a data-go="script"><b>2</b>✍️ 대본 만들기<i id="s-script"></i></a>
+ <a data-go="tts"><b>3</b>🔊 TTS 음성<i id="s-tts"></i></a>
+ <a data-go="video"><b>4</b>🎬 영상 만들기<i id="s-video"></i></a>
+ <div class="navfoot"><div id="curProd" class="hint"></div><button id="bSet">⚙️ API 키 설정</button></div>
+</nav>
 <main>
+<section class="page" id="p-know">
+ <h2 class="pt">📚 노하우 학습 <small class="m">oCam으로 녹화한 노하우 영상을 AI(Gemini)가 보고 정리합니다</small></h2>
+ <div class="card">
+  <div class="row">
+   <label class="btn pri">📁 oCam 폴더 선택<input type="file" id="kDir" webkitdirectory multiple hidden></label>
+   <label class="btn">🎞️ 영상 파일 선택<input type="file" id="kPick" accept="video/*,.avi,.mkv,.wmv,.flv" multiple hidden></label>
+   <button id="kGo" class="pri">🧠 분석 시작</button>
+   <button id="kMerge">🔁 노하우 다시 통합</button>
+   <button id="kClear">목록 비우기</button>
+  </div>
+  <p class="hint">내 PC의 <b>C:\Users\USER\Documents\oCam</b> 폴더를 선택하세요. 영상은 Google Gemini로 보내 분석하고, 분석 결과만 이 브라우저에 저장됩니다. 20MB가 넘는 영상은 화면 캡처(최대 150장)와 음성으로 줄여서 보냅니다.</p>
+  <div id="kSt"></div>
+  <div id="kList"></div>
+ </div>
+ <div class="card">
+  <div class="row"><b style="font-size:15px">📝 최종 노하우 가이드</b><span class="hint">대본을 만들 때 이 내용이 규칙으로 쓰입니다. 직접 고쳐도 됩니다.</span><span class="sp"></span><button id="kSave">💾 저장</button></div>
+  <textarea id="kText" rows="20" placeholder="아직 없습니다. 위에서 영상을 분석하면 자동으로 채워집니다. 직접 적어 넣어도 됩니다."></textarea>
+  <details style="margin-top:8px"><summary class="hint" style="cursor:pointer">영상별 분석 결과 보기</summary><div id="kEach"></div></details>
+ </div>
+</section>
+<section class="page" id="p-find">
+<h2 class="pt">🔍 쇼핑 상품 찾기 <small class="m">결과 표 맨 오른쪽 ✍️ 대본 버튼을 누르면 그 영상을 참고해 대본을 만듭니다</small></h2>
 <section class="card">
  <div class="row"><label class="grow"><span>검색 키워드</span><input id="q" placeholder="예) 살림템, 다이소 꿀템, 주방용품, 자취템" style="font-size:16px"></label><button id="bGo" class="pri big">🔍 검색</button></div>
  <div class="row"><span class="lbl">플랫폼</span>
@@ -65,13 +117,79 @@ dialog{border:none;border-radius:14px;padding:20px 22px;width:min(660px,94vw);bo
   <th data-k="platform">플랫폼</th><th data-k="title">제목</th><th data-k="channelName">채널</th><th data-k="followers" class="n">구독자/팔로워</th>
   <th data-k="publishedAt">업로드</th><th data-k="durationSec" class="n">길이</th><th data-k="views" class="n">조회수</th><th data-k="likes" class="n">좋아요</th>
   <th data-k="comments" class="n">댓글</th><th data-k="engagement" class="n" title="(좋아요+댓글)/조회수">참여율</th><th data-k="vpf" class="n" title="조회수/구독자">떡상지수</th>
-  <th data-k="matchCount" class="n">구매의도 댓글</th><th data-k="intentRate" class="n">구매의도율</th></tr></thead><tbody id="tb"></tbody></table></div>
+  <th data-k="matchCount" class="n">구매의도 댓글</th><th data-k="intentRate" class="n">구매의도율</th><th>만들기</th></tr></thead><tbody id="tb"></tbody></table></div>
+</section>
+</section>
+<section class="page" id="p-script">
+ <h2 class="pt">✍️ 대본 만들기</h2>
+ <div class="card">
+  <div id="sProd"></div>
+  <div class="row">
+   <label class="grow"><span>상품명 (비우면 AI가 참고 영상에서 추론)</span><input id="spName" placeholder="예) 무선 미니 청소기"></label>
+   <label><span>영상 길이</span><select id="spLen"><option value="15">15초</option><option value="30" selected>30초</option><option value="45">45초</option><option value="60">60초</option></select></label>
+   <label><span>말투</span><select id="spTone"><option>친근한 반말</option><option>친절한 존댓말</option><option>솔직 리뷰어</option><option>유머/드립</option><option>전문가 설명</option></select></label>
+  </div>
+  <div class="row">
+   <label class="grow"><span>특징·장점 (아는 만큼)</span><textarea id="spFeat" rows="2" placeholder="예) 무게 500g, 흡입력 강함, USB-C 충전"></textarea></label>
+   <label class="grow"><span>가격·구매처·혜택</span><textarea id="spPrice" rows="2" placeholder="예) 2만원대, 쿠팡 로켓배송, 고정댓글 링크"></textarea></label>
+  </div>
+  <div class="row">
+   <label class="grow"><span>타깃</span><input id="spTarget" placeholder="예) 자취생, 육아맘, 캠핑러"></label>
+   <label class="grow"><span>추가 요청</span><input id="spExtra" placeholder="예) 첫 문장은 질문으로 시작"></label>
+  </div>
+  <div class="row"><button id="sGen" class="pri big">✨ AI 대본 생성</button><button id="sAuto" class="big">⚡ 대본 + 음성 한 번에</button><span id="sKh" class="hint"></span></div>
+  <div id="sSt"></div>
+ </div>
+ <div id="sOut"></div>
+</section>
+
+<section class="page" id="p-tts">
+ <h2 class="pt">🔊 TTS 음성 <small class="m">장면별 내레이션을 Gemini 음성으로 만듭니다</small></h2>
+ <div class="card">
+  <div class="row">
+   <label><span>목소리</span><select id="tVoice"></select></label>
+   <button id="tSample">▶ 미리 듣기</button>
+   <label class="grow"><span>읽는 스타일 (AI에게 주는 지시 · 지시문까지 읽으면 비우세요)</span><input id="tStyle"></label>
+  </div>
+  <div class="row"><button id="tAll" class="pri big">🔊 전체 음성 만들기</button><span id="tSum" class="hint"></span><span class="sp"></span><button data-go2="video">다음: 영상 만들기 →</button></div>
+  <div id="tSt"></div><audio id="tSampleAudio" hidden></audio>
+ </div>
+ <div class="card" id="tOut"></div>
+</section>
+
+<section class="page" id="p-video">
+ <h2 class="pt">🎬 영상 만들기 <small class="m">장면 순서대로 소스 + 음성 + 자막을 합쳐 세로 영상(1080×1920)으로 저장</small></h2>
+ <div class="row" style="align-items:flex-start">
+  <div class="card" style="flex:1;min-width:420px">
+   <div class="row"><b style="font-size:15px">장면 순서 · 소스 배치</b><span class="sp"></span><label class="btn">📥 사진/영상 여러 개 한 번에<input type="file" id="vBulk" accept="image/*,video/*" multiple hidden></label></div>
+   <p class="hint">장면마다 보여줄 사진이나 영상을 넣고 ↑↓로 순서를 바꾸세요. 소스가 없는 장면은 상품명 화면으로 나옵니다. 직접 찍었거나 사용 권한이 있는 소스만 쓰세요.</p>
+   <div id="vList"></div>
+  </div>
+  <div class="card" style="width:340px">
+   <canvas id="vCanvas" width="1080" height="1920"></canvas>
+   <div class="prog" style="margin:8px 0"><div id="vProg"></div></div>
+   <label class="c"><input type="checkbox" id="vSubs" checked> 내레이션 자막</label>
+   <label class="c"><input type="checkbox" id="vCap" checked> 강조 자막 (상단)</label>
+   <label><span>화면 채우기</span><select id="vFit"><option value="cover">꽉 채우기 (가장자리 잘림)</option><option value="contain">전체 보이기 (배경 흐림)</option></select></label>
+   <label style="margin-top:6px"><span>배경음악 (선택)</span><input type="file" id="vBgm" accept="audio/*"></label>
+   <label style="margin-top:6px"><span>배경음악 볼륨</span><input type="range" id="vBgmVol" min="0" max="0.5" step="0.01" value="0.12"></label>
+   <label class="c" style="margin-top:6px"><input type="checkbox" id="vMon"> 만드는 동안 소리 듣기</label>
+   <button id="vGo" class="pri big" style="width:100%;margin-top:6px">🎬 영상 만들기</button>
+   <p class="hint">영상 길이만큼 시간이 걸립니다. 만드는 동안 이 탭을 계속 띄워두세요 (다른 탭으로 가면 끊길 수 있음).</p>
+   <div id="vSt"></div><div id="vOut"></div>
+  </div>
+ </div>
 </section>
 </main>
+</div>
 
 <dialog id="dSet"><form method="dialog">
  <h2 style="margin-top:0">⚙️ API 키 설정</h2>
  <p class="hint">키는 이 브라우저에만 저장됩니다.</p>
+ <label><span>Gemini API 키 (노하우 분석 · 대본 · TTS) — <a href="https://aistudio.google.com/apikey" target="_blank">무료 발급</a></span><input id="kGm" type="password" placeholder="AIza..."></label>
+ <details style="margin-bottom:12px"><summary class="hint" style="cursor:pointer">고급: Gemini 모델 이름 (보통은 비워두세요)</summary>
+  <div class="row"><label class="grow"><span>분석·대본 모델 (비우면 gemini-3.8-flash → 3.5 → 2.5 순으로 자동)</span><input id="kGmModel" placeholder="gemini-3.8-flash"></label>
+  <label class="grow"><span>TTS 모델 (비우면 자동)</span><input id="kTtsModel" placeholder="gemini-3.1-flash-tts-preview"></label></div></details>
  <label><span>YouTube Data API v3 키 — <a href="https://console.cloud.google.com/apis/library/youtube.googleapis.com" target="_blank">발급하기</a> (무료)</span><input id="kYt" type="password" placeholder="AIza..."></label>
  <label><span>Apify 토큰 (TikTok/Instagram/Douyin) — <a href="https://console.apify.com/settings/integrations" target="_blank">발급하기</a> (매달 $5 무료)</span><input id="kAp" type="password" placeholder="apify_api_..."></label>
  <div class="row">
@@ -383,7 +501,7 @@ function render() {
     <td class="n"><b>${fN(i.views)}</b></td><td class="n">${fN(i.likes)}</td><td class="n">${fN(i.comments)}</td><td class="n">${fP(i.engagement)}</td>
     <td class="n ${i.vpf >= 10 ? 'hot' : ''}">${i.vpf == null ? '-' : i.vpf.toFixed(i.vpf < 10 ? 1 : 0) + '배'}</td>
     <td class="n"><span class="it ${i.matchCount ? '' : 'z'}" data-d>${i.commentsScanned == null ? '-' : i.matchCount}</span>${i.commentsScanned != null ? `<div class="m">/${i.commentsScanned}개 중</div>` : ''}</td>
-    <td class="n">${fP(i.intentRate)}</td></tr>`; }).join('');
+    <td class="n">${fP(i.intentRate)}</td><td><button class="sm pri" data-mk>✍️ 대본</button></td></tr>`; }).join('');
 }
 
 function detail(i) {
@@ -412,9 +530,10 @@ $('#q').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.isComposi
 $$('[data-p]').forEach(b => b.onclick = () => { $('#kw').value = b.dataset.p === 'x' ? '' : [...new Set([...kwList(), ...PRESETS[b.dataset.p]])].join(', '); save(); });
 $$('th[data-k]').forEach(th => th.onclick = () => { const k = th.dataset.k; if (S.key === k) S.dir *= -1; else { S.key = k; S.dir = ['title','channelName','platform'].includes(k) ? 1 : -1; } render(); });
 ['#fT','#fV','#fF','#fX','#fI','#fS'].forEach(s => $(s).oninput = render);
-$('#tb').onclick = e => { if (!e.target.closest('[data-d]')) return; const id = e.target.closest('tr').dataset.id, i = S.items.find(x => x.platform + ':' + x.id === id); if (i && i.commentsScanned != null) detail(i); };
+$('#tb').onclick = e => { const tr = e.target.closest('tr'); if (!tr) return; const i = S.items.find(x => x.platform + ':' + x.id === tr.dataset.id); if (!i) return; if (e.target.closest('[data-mk]')) return pickProduct(i); if (e.target.closest('[data-d]') && i.commentsScanned != null) detail(i); };
 $('#bCsv').onclick = csv;
 $('#bSet').onclick = () => {
+  $('#kGm').value = localStorage.getItem('ssf.gm') || ''; $('#kGmModel').value = localStorage.getItem('ssf.gmModel') || ''; $('#kTtsModel').value = localStorage.getItem('ssf.ttsModel') || '';
   $('#kYt').value = localStorage.getItem('ssf.yt') || ''; $('#kAp').value = localStorage.getItem('ssf.ap') || '';
   $('#maxUsd').value = localStorage.getItem('ssf.maxUsd') || '0.5'; $('#igF').checked = localStorage.getItem('ssf.igF') !== '0';
   let saved = {}; try { saved = JSON.parse(localStorage.getItem('ssf.actors') || '{}'); } catch {}
@@ -423,11 +542,628 @@ $('#bSet').onclick = () => {
     <label style="flex:1"><span>추가 입력(JSON, 선택)</span><input class="aX" placeholder='{"예시": 1}' value="${esc(saved[k]?.extra || '')}"></label></div>`).join('');
   $('#dSet').showModal(); };
 $('#bSave').onclick = () => {
+  localStorage.setItem('ssf.gm', $('#kGm').value.trim()); localStorage.setItem('ssf.gmModel', $('#kGmModel').value.trim()); localStorage.setItem('ssf.ttsModel', $('#kTtsModel').value.trim());
   localStorage.setItem('ssf.yt', $('#kYt').value.trim()); localStorage.setItem('ssf.ap', $('#kAp').value.trim());
   localStorage.setItem('ssf.maxUsd', String(Math.max(0.05, +$('#maxUsd').value || 0.5))); localStorage.setItem('ssf.igF', $('#igF').checked ? '1' : '0');
   const a = {}; $$('#actorRows [data-role]').forEach(r => { const actor = r.querySelector('.aA').value.trim(), extra = r.querySelector('.aX').value.trim(); if (actor || extra) a[r.dataset.role] = { actor, extra }; });
   localStorage.setItem('ssf.actors', JSON.stringify(a)); };
-load();
+
+// =====================================================================
+//                      숏폼 쇼핑 스튜디오 (노하우 → 대본 → TTS → 영상)
+// =====================================================================
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const setSt = (sel, cls, html) => { $(sel).innerHTML = html ? `<div class="msg ${cls}">${html}</div>` : ''; };
+const PJ = { product: null, knowhow: '', analyses: [], script: null, form: {}, audio: [], media: [], bgm: null, video: null };
+const FORM_IDS = ['spName', 'spFeat', 'spPrice', 'spTarget', 'spLen', 'spTone', 'spExtra'];
+const getForm = () => { const f = {}; FORM_IDS.forEach(id => f[id] = $('#' + id).value); return { name: f.spName.trim(), feat: f.spFeat.trim(), price: f.spPrice.trim(), target: f.spTarget.trim(), len: +f.spLen || 30, tone: f.spTone, extra: f.spExtra.trim(), raw: f }; };
+function saveP() {
+  PJ.form = getForm();
+  try { localStorage.setItem('ssf.proj', JSON.stringify({ product: PJ.product, knowhow: PJ.knowhow, analyses: PJ.analyses, script: PJ.script, form: PJ.form.raw })); }
+  catch (e) { console.warn('저장 실패', e); }
+  updateNav();
+}
+let saveTimer; const saveSoon = () => { clearTimeout(saveTimer); saveTimer = setTimeout(saveP, 400); };
+function loadP() {
+  let s = {}; try { s = JSON.parse(localStorage.getItem('ssf.proj') || '{}'); } catch {}
+  PJ.product = s.product || null; PJ.knowhow = s.knowhow || ''; PJ.analyses = s.analyses || []; PJ.script = s.script || null;
+  if (s.form) FORM_IDS.forEach(id => { if (s.form[id] != null) $('#' + id).value = s.form[id]; });
+  $('#kText').value = PJ.knowhow;
+  $('#tVoice').innerHTML = VOICES.map(([v, d]) => `<option value="${v}">${v} — ${d}</option>`).join('');
+  $('#tVoice').value = localStorage.getItem('ssf.voice') || 'Kore';
+  $('#tStyle').value = localStorage.getItem('ssf.style') ?? '밝고 신나는 쇼핑 쇼츠 말투로 조금 빠르게 읽어줘';
+  PJ.form = getForm();
+}
+const audioOk = i => { const s = PJ.script?.scenes?.[i]; if (!s) return false; return !String(s.narration || '').trim() || (!!PJ.audio[i] && PJ.audio[i].text === s.narration); };
+function updateNav() {
+  const sc = PJ.script?.scenes || [];
+  $('#s-know').textContent = PJ.knowhow ? '✓' : '';
+  $('#s-find').textContent = PJ.product ? '✓' : '';
+  $('#s-script').textContent = sc.length ? '✓' : '';
+  $('#s-tts').textContent = sc.length && sc.every((s, i) => audioOk(i)) && sc.some(s => s.narration) ? '✓' : '';
+  $('#s-video').textContent = PJ.video ? '✓' : '';
+  const name = PJ.form?.name || PJ.script?.productName || PJ.product?.title || '';
+  $('#curProd').innerHTML = name ? `작업 중인 상품<br><b style="color:#fff">${esc(name.slice(0, 40))}</b>` : '';
+}
+let curPage = 'find';
+function go(pg) {
+  curPage = pg;
+  $$('.page').forEach(p => p.classList.toggle('on', p.id === 'p-' + pg));
+  $$('nav a[data-go]').forEach(a => a.classList.toggle('on', a.dataset.go === pg));
+  localStorage.setItem('ssf.page', pg);
+  refresh(); window.scrollTo(0, 0);
+}
+function refresh() { if (curPage === 'know') renderKnow(); if (curPage === 'script') renderScript(); if (curPage === 'tts') renderTTS(); if (curPage === 'video') renderVideoPage(); updateNav(); }
+
+// ------------------------------------------------------------ Gemini
+const TEXT_MODELS = ['gemini-3.8-flash', 'gemini-3.5-flash', 'gemini-2.5-flash'];
+const TTS_MODELS = ['gemini-3.1-flash-tts-preview', 'gemini-2.5-flash-preview-tts'];
+const gemOk = {};
+async function gem(kind, body, note) {
+  const key = (localStorage.getItem('ssf.gm') || '').trim();
+  if (!key) throw new Error('Gemini API 키가 없습니다. 왼쪽 아래 ⚙️ API 키 설정에서 입력하세요.');
+  const custom = (localStorage.getItem(kind === 'tts' ? 'ssf.ttsModel' : 'ssf.gmModel') || '').trim();
+  const models = [...new Set([custom, gemOk[kind], ...(kind === 'tts' ? TTS_MODELS : TEXT_MODELS)].filter(Boolean))];
+  let last;
+  for (const m of models) {
+    for (let a = 0; a < 5; a++) {
+      const u = new URL(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent`);
+      u.searchParams.set('key', key);
+      let r, j;
+      try { r = await fetch(u, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) }); j = await r.json().catch(() => ({})); }
+      catch (e) { last = new Error('Gemini 연결 실패: ' + e.message); await sleep(3000); continue; }
+      if (r.ok) { gemOk[kind] = m; return j; }
+      const msg = j?.error?.message || r.statusText;
+      last = new Error(`Gemini(${m}) 오류 ${r.status}: ${msg}`);
+      if (r.status === 404 || /not found|not supported|unknown model|does not exist|is not available/i.test(msg)) break;
+      if (r.status === 429 || r.status >= 500) {
+        const rd = JSON.stringify(j).match(/"retryDelay":\s*"(\d+)/);
+        const w = Math.min(65000, rd ? (+rd[1] + 1) * 1000 : 8000 * (a + 1));
+        note?.(`Gemini 요청 한도에 걸려 ${Math.round(w / 1000)}초 기다렸다 다시 시도합니다… (${a + 1}/5)`);
+        await sleep(w); continue;
+      }
+      if (r.status === 400 && /api key|API_KEY/i.test(msg)) throw new Error('Gemini API 키가 올바르지 않습니다. ⚙️ 설정에서 다시 확인해 주세요.');
+      throw last;
+    }
+  }
+  throw last || new Error('Gemini 호출 실패');
+}
+function gemText(j) {
+  const c = j?.candidates?.[0];
+  if (!c) throw new Error('Gemini 응답이 비었습니다' + (j?.promptFeedback?.blockReason ? ` (차단 사유: ${j.promptFeedback.blockReason})` : ''));
+  const t = (c.content?.parts || []).filter(p => p.text && !p.thought).map(p => p.text).join('');
+  if (!t) throw new Error('Gemini가 내용을 돌려주지 않았습니다 (사유: ' + (c.finishReason || '알 수 없음') + ')');
+  return t;
+}
+function parseJSON(s) {
+  s = String(s).trim().replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '');
+  try { return JSON.parse(s); } catch {}
+  const a = s.indexOf('{'), b = s.lastIndexOf('}');
+  if (a >= 0 && b > a) try { return JSON.parse(s.slice(a, b + 1)); } catch {}
+  throw new Error('AI 응답을 해석하지 못했습니다: ' + s.slice(0, 200));
+}
+const blobToB64 = b => new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(String(fr.result).split(',')[1] || ''); fr.onerror = () => rej(fr.error); fr.readAsDataURL(b); });
+const b64ToBytes = s => { const bin = atob(s), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return u; };
+function wavFromPCM16(bytes, rate) {
+  const n = bytes.byteLength, h = new ArrayBuffer(44), d = new DataView(h);
+  const w = (o, s) => { for (let i = 0; i < s.length; i++) d.setUint8(o + i, s.charCodeAt(i)); };
+  w(0, 'RIFF'); d.setUint32(4, 36 + n, true); w(8, 'WAVE'); w(12, 'fmt '); d.setUint32(16, 16, true); d.setUint16(20, 1, true); d.setUint16(22, 1, true);
+  d.setUint32(24, rate, true); d.setUint32(28, rate * 2, true); d.setUint16(32, 2, true); d.setUint16(34, 16, true); w(36, 'data'); d.setUint32(40, n, true);
+  return new Blob([h, bytes], { type: 'audio/wav' });
+}
+const fmtSec = t => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`;
+
+// ------------------------------------------------------------ 0. 노하우 학습
+const VEXT = /\.(mp4|m4v|mov|avi|mkv|webm|wmv|flv|mpg|mpeg|3gp)$/i;
+const VMIME = { mp4: 'video/mp4', m4v: 'video/mp4', mov: 'video/mov', avi: 'video/avi', webm: 'video/webm', wmv: 'video/wmv', flv: 'video/x-flv', mpg: 'video/mpeg', mpeg: 'video/mpeg', '3gp': 'video/3gpp' };
+const INLINE_MAX = 20e6;
+let kFiles = [];
+function addKFiles(list) {
+  const have = new Set(kFiles.map(k => k.file.name + ':' + k.file.size));
+  const vids = [...list].filter(f => VEXT.test(f.name) || /^video\//.test(f.type));
+  for (const f of vids) if (!have.has(f.name + ':' + f.size)) kFiles.push({ file: f, status: PJ.analyses.some(a => a.file === f.name) ? '완료(이전 분석)' : '대기' });
+  kFiles.sort((a, b) => a.file.name.localeCompare(b.file.name, 'ko', { numeric: true }));
+  setSt('#kSt', vids.length ? 'ok' : 'warn', vids.length ? `영상 ${vids.length}개를 불러왔습니다. 🧠 분석 시작을 누르세요.` : '선택한 곳에 영상 파일이 없습니다.');
+  renderKnow();
+}
+function renderKnow() {
+  $('#kList').innerHTML = kFiles.length ? `<table class="sc"><tr><th>#</th><th>파일</th><th class="n">크기</th><th>상태</th></tr>${kFiles.map((k, i) =>
+    `<tr><td>${i + 1}</td><td>${esc(k.file.webkitRelativePath || k.file.name)}</td><td class="n">${(k.file.size / 1e6).toFixed(1)}MB</td><td>${esc(k.status)}</td></tr>`).join('')}</table>` : '';
+  $('#kEach').innerHTML = PJ.analyses.length ? PJ.analyses.map(a => `<details class="card" style="margin:8px 0"><summary><b>${esc(a.file)}</b> — ${esc(a.title || '')}</summary><pre style="white-space:pre-wrap;font-size:12px">${esc(JSON.stringify(a, null, 1))}</pre></details>`).join('') : '<p class="hint">아직 없음</p>';
+  if (document.activeElement !== $('#kText')) $('#kText').value = PJ.knowhow;
+}
+const seekTo = (v, t) => new Promise(res => { let done = false; const h = () => { if (done) return; done = true; v.removeEventListener('seeked', h); res(); }; v.addEventListener('seeked', h); v.currentTime = t; setTimeout(h, 4000); });
+async function extractFrames(file, onProg) {
+  const url = URL.createObjectURL(file), v = document.createElement('video');
+  v.muted = true; v.preload = 'auto'; v.src = url;
+  try {
+    await new Promise((res, rej) => { v.onloadedmetadata = res; v.onerror = () => rej(new Error('브라우저가 이 영상 형식을 열 수 없습니다 (oCam 설정에서 MP4로 저장하면 됩니다)')); });
+    const dur = v.duration; if (!isFinite(dur) || dur <= 0) throw new Error('영상 길이를 읽을 수 없습니다');
+    const vw = v.videoWidth || 1280, vh = v.videoHeight || 720, W = Math.min(1280, vw), H = Math.round(W * vh / vw);
+    const c = document.createElement('canvas'); c.width = W; c.height = H; const g = c.getContext('2d');
+    const sc = document.createElement('canvas'); sc.width = 48; sc.height = 27; const sg = sc.getContext('2d', { willReadFrequently: true });
+    const step = Math.max(1, dur / 150), frames = []; let prev = null, lastT = -99;
+    for (let t = Math.min(0.3, dur / 2); t < dur; t += step) {
+      await seekTo(v, t);
+      sg.drawImage(v, 0, 0, 48, 27); const px = sg.getImageData(0, 0, 48, 27).data;
+      let diff = 255; if (prev) { diff = 0; for (let i = 0; i < px.length; i += 4) diff += Math.abs(px[i] - prev[i]) + Math.abs(px[i + 1] - prev[i + 1]); diff /= px.length / 2; }
+      if (diff > 1.5 || t - lastT > 12) {
+        g.drawImage(v, 0, 0, W, H);
+        const b = await new Promise(r => c.toBlob(r, 'image/jpeg', 0.72));
+        frames.push({ t, data: await blobToB64(b) }); prev = px; lastT = t;
+      }
+      onProg?.(t / dur, frames.length);
+    }
+    return { dur, frames };
+  } finally { URL.revokeObjectURL(url); }
+}
+async function extractAudio(file) {
+  try {
+    if (file.size > 400e6) return null;
+    const ctx = new OfflineAudioContext(1, 1, 16000);
+    const buf = await ctx.decodeAudioData(await file.arrayBuffer());
+    const len = Math.min(buf.length, 16000 * 600), mono = new Float32Array(len);
+    for (let ch = 0; ch < buf.numberOfChannels; ch++) { const d = buf.getChannelData(ch); for (let i = 0; i < len; i++) mono[i] += d[i] / buf.numberOfChannels; }
+    let rms = 0; for (let i = 0; i < len; i += 16) rms += mono[i] * mono[i]; rms = Math.sqrt(rms / (len / 16));
+    if (rms < 0.004) return null; // 무음
+    const pcm = new Int16Array(len); for (let i = 0; i < len; i++) pcm[i] = Math.max(-1, Math.min(1, mono[i])) * 32767;
+    return blobToB64(wavFromPCM16(new Uint8Array(pcm.buffer), 16000));
+  } catch { return null; }
+}
+const KNOW_PROMPT = `너는 쇼핑 숏폼(유튜브 쇼츠·릴스·틱톡) 제작 전문가다.
+이 자료는 사용자가 '스레드(Threads)에 올라온 쇼핑 숏폼 제작 노하우 글'과 '관련 사이트/툴이 돌아가는 장면'을 화면 녹화한 것이다.
+화면에 나오는 글자를 스크롤되는 부분까지 빠짐없이 읽고, 음성이 있으면 음성도 참고해서 아래 JSON으로 정리해라.
+영상에 실제로 나온 내용만 적고, 추측하거나 지어내지 마라. 없는 항목은 빈 배열로 둔다.
+{
+ "title": "이 영상 내용 한 줄 요약",
+ "transcript": "화면의 글 원문을 최대한 그대로 옮겨 적기 (같은 글이 반복되면 한 번만)",
+ "productSelection": ["어떤 상품을 고르라고 하는지"],
+ "hook": ["첫 1~3초 후킹 방법과 예시 문장"],
+ "scriptStructure": ["대본 구성 순서"],
+ "sceneOrder": ["장면 배치·컷 순서 규칙"],
+ "captions": ["자막 스타일 규칙"],
+ "tts": ["음성·말투·속도 규칙"],
+ "editing": ["편집 규칙 (길이, 컷 길이, BGM 등)"],
+ "cta": ["구매 유도, 댓글·링크 유도 방법"],
+ "tools": [{"name": "사이트/툴 이름", "purpose": "용도", "howTo": "사용 순서"}],
+ "donts": ["하지 말라는 것"],
+ "examples": ["영상에 나온 실제 예시 대본·문구"]
+}`;
+async function analyzeVideo(file, st) {
+  const ext = (file.name.match(/\.([^.]+)$/)?.[1] || '').toLowerCase(), mime = VMIME[ext] || (/^video\//.test(file.type) ? file.type : '');
+  const parts = [{ text: KNOW_PROMPT + `\n\n파일명: ${file.name}` }];
+  const inline = async () => { st('영상 원본 보내는 중…'); parts.push({ inlineData: { mimeType: mime, data: await blobToB64(file) } }); };
+  if (mime && file.size <= INLINE_MAX) await inline();
+  else {
+    try {
+      const { dur, frames } = await extractFrames(file, (p, n) => st(`화면 캡처 중… ${Math.round(p * 100)}% (${n}장)`));
+      st('음성 추출 중…'); const audio = await extractAudio(file);
+      parts.push({ text: `(영상이 커서 ${frames.length}장의 화면 캡처${audio ? '와 음성' : ''}로 보냅니다. 영상 길이 ${fmtSec(dur)}. 각 이미지 앞의 [분:초]는 영상 속 시간입니다.)` });
+      for (const f of frames) { parts.push({ text: `[${fmtSec(f.t)}]` }); parts.push({ inlineData: { mimeType: 'image/jpeg', data: f.data } }); }
+      if (audio) parts.push({ inlineData: { mimeType: 'audio/wav', data: audio } });
+    } catch (e) {
+      if (mime && file.size <= 70e6) { parts.length = 1; await inline(); } else throw e;
+    }
+  }
+  st('Gemini가 분석 중…');
+  const j = await gem('text', { contents: [{ role: 'user', parts }], generationConfig: { responseMimeType: 'application/json', temperature: 0.2 } }, st);
+  const r = parseJSON(gemText(j));
+  if (typeof r.transcript === 'string') r.transcript = r.transcript.slice(0, 8000);
+  return r;
+}
+async function analyzeAll() {
+  const todo = kFiles.filter(k => !k.status.startsWith('완료'));
+  if (!todo.length) { if (!kFiles.length) return alert('먼저 📁 oCam 폴더나 영상 파일을 선택하세요.'); if (!confirm('모두 분석된 영상입니다. 다시 분석할까요?')) return; todo.push(...kFiles); }
+  $('#kGo').disabled = true; let ok = 0, fail = 0;
+  try {
+    for (const [n, k] of todo.entries()) {
+      const st = s => { k.status = s; setSt('#kSt', '', `⏳ ${n + 1}/${todo.length} <b>${esc(k.file.name)}</b> — ${esc(s)}`); renderKnow(); };
+      try {
+        st('준비 중…');
+        const res = await analyzeVideo(k.file, st);
+        PJ.analyses = PJ.analyses.filter(a => a.file !== k.file.name); PJ.analyses.push({ file: k.file.name, ...res });
+        k.status = '완료'; ok++; saveP();
+      } catch (e) { k.status = '❌ ' + e.message; fail++; }
+      renderKnow(); await sleep(1200);
+    }
+    if (PJ.analyses.length) await mergeKnow();
+    setSt('#kSt', fail ? 'warn' : 'ok', `✅ 분석 완료: 성공 ${ok}개${fail ? ` · 실패 ${fail}개 (표의 상태에서 이유 확인)` : ''}. 아래 최종 노하우 가이드를 확인하세요.`);
+  } catch (e) { setSt('#kSt', 'err', '❌ ' + esc(e.message)); }
+  finally { $('#kGo').disabled = false; }
+}
+async function mergeKnow() {
+  if (!PJ.analyses.length) return alert('분석된 영상이 없습니다.');
+  setSt('#kSt', '', `⏳ 영상 ${PJ.analyses.length}개의 노하우를 하나로 통합하는 중…`);
+  const data = PJ.analyses.map(a => ({ ...a, transcript: String(a.transcript || '').slice(0, 4000) }));
+  const prompt = `아래는 쇼핑 숏폼 제작 노하우를 녹화한 영상 ${data.length}개를 각각 분석한 결과(JSON)다. 이것을 하나의 '제작 노하우 가이드'로 통합해라.
+- 중복은 합치고, 서로 다른 주장은 둘 다 적되 표시한다
+- 구체적인 숫자, 예시 문장, 툴 사용 순서는 최대한 살린다
+- 자료에 없는 내용은 지어내지 않는다
+- 이 가이드는 AI가 대본을 쓸 때 규칙으로 그대로 쓰이므로, 실행 가능한 규칙 문장으로 쓴다
+형식 (일반 텍스트, 마크다운 제목 사용):
+# 1. 상품 선정 기준
+# 2. 후킹 (첫 1~3초)
+# 3. 대본 구조 (순서대로)
+# 4. 장면 배치 규칙
+# 5. 자막 규칙
+# 6. TTS·말투
+# 7. 편집 규칙
+# 8. 구매 유도 (CTA)
+# 9. 사용하는 사이트·툴과 사용법
+# 10. 금지사항
+# 11. 예시 대본·문구
+
+[분석 결과]
+${JSON.stringify(data)}`;
+  const j = await gem('text', { contents: [{ role: 'user', parts: [{ text: prompt }] }], generationConfig: { temperature: 0.3 } }, s => setSt('#kSt', 'warn', esc(s)));
+  PJ.knowhow = gemText(j).trim(); $('#kText').value = PJ.knowhow; saveP(); renderKnow();
+  setSt('#kSt', 'ok', '✅ 노하우 가이드를 만들었습니다. 이제 대본을 만들 때 자동으로 적용됩니다.');
+}
+
+// ------------------------------------------------------------ 1 → 2. 상품 선택
+function pickProduct(it) {
+  PJ.product = { platform: it.platform, id: it.id, url: it.url, title: it.title, description: (it.description || '').slice(0, 800), views: it.views, likes: it.likes, comments: it.comments,
+    followers: it.followers, channelName: it.channelName, publishedAt: it.publishedAt, shopSignals: it.shopSignals, topComments: (it.matchedComments || []).slice(0, 15).map(c => c.text) };
+  if (PJ.script && !confirm('새 상품을 골랐습니다. 지금 만들어 둔 대본과 음성을 비우고 새로 시작할까요?\n(취소를 누르면 대본은 그대로 두고 참고 상품만 바꿉니다)')) { saveP(); return go('script'); }
+  PJ.script = null; PJ.audio = []; PJ.video = null; $('#spName').value = ''; $('#spFeat').value = ''; $('#spPrice').value = '';
+  saveP(); go('script');
+}
+
+// ------------------------------------------------------------ 2. 대본
+const DEFAULT_GUIDE = `(기본 가이드 — 노하우 학습을 하면 이 내용 대신 학습한 노하우가 쓰입니다)
+1. 첫 1~2초: 문제 상황이나 놀라운 결과를 바로 보여주는 한 문장으로 후킹 (예: "아직도 이렇게 해요?")
+2. 순서: 후킹 → 문제 공감 → 제품 등장 → 사용 장면 2~3컷 → 핵심 장점 1~2개 → 가격·혜택 → 구매 유도
+3. 한 장면은 2~4초, 내레이션은 짧은 구어체
+4. 강조 자막은 6~12자, 핵심 단어만
+5. 마지막에 "제품 정보는 고정 댓글/프로필 링크에"처럼 구매 경로를 안내
+6. 과장·허위 효능 표현 금지`;
+function prodCard() {
+  const p = PJ.product;
+  if (!p) return `<div class="pcard"><div style="flex:1">🔍 <b>쇼핑 상품 찾기</b> 결과에서 <b>✍️ 대본</b> 버튼을 누르면 참고 영상 정보(조회수·구매의도 댓글)가 여기에 들어옵니다. 상품명만 직접 입력해도 됩니다.</div><button data-go2="find">상품 찾으러 가기</button></div>`;
+  return `<div class="pcard"><span class="b ${p.platform}">${PF[p.platform] || ''}</span><div style="flex:1"><a href="${esc(p.url)}" target="_blank"><b>${esc((p.title || '').slice(0, 140))}</b></a>
+    <div class="m">${esc(p.channelName || '')} · 구독자 ${fN(p.followers)} · 조회 ${fN(p.views)} · 좋아요 ${fN(p.likes)} · 댓글 ${fN(p.comments)}</div>
+    ${p.topComments?.length ? `<div class="m">💬 구매의도 댓글: ${p.topComments.slice(0, 6).map(esc).join(' / ')}</div>` : ''}</div><button data-clearprod>✕ 참고 해제</button></div>`;
+}
+function renderScript() {
+  $('#sProd').innerHTML = prodCard();
+  $('#sKh').innerHTML = PJ.knowhow ? `📚 학습한 노하우 적용 중 (영상 ${PJ.analyses.length}개)` : `📚 아직 노하우 학습 전이라 기본 가이드를 씁니다 → <a href="#" data-go2="know">노하우 학습하기</a>`;
+  const s = PJ.script;
+  if (!s) { $('#sOut').innerHTML = ''; return; }
+  const total = s.scenes.reduce((a, c) => a + String(c.narration || '').length, 0);
+  $('#sOut').innerHTML = `<div class="card">
+   <div class="row"><label class="grow"><span>영상 제목 (업로드용)</span><input data-sf="title" value="${esc(s.title || '')}"></label><span class="sp"></span>
+    <button id="sCopy">📋 대본 복사</button><button data-go2="tts" class="pri">다음: 음성 만들기 →</button></div>
+   ${s.angle ? `<p class="hint">🎯 소구 포인트: ${esc(s.angle)} · 내레이션 총 ${total}자 (약 ${(total / 6.5).toFixed(0)}초)</p>` : ''}
+   <table class="sc"><tr><th>#</th><th style="width:25%">화면 (보여줄 것)</th><th>내레이션 (TTS로 읽음)</th><th style="width:17%">강조 자막</th><th>초</th><th style="width:118px">순서</th></tr>
+   ${s.scenes.map((c, i) => `<tr><td>${i + 1}</td>
+    <td><textarea data-i="${i}" data-f="visual">${esc(c.visual)}</textarea></td>
+    <td><textarea data-i="${i}" data-f="narration">${esc(c.narration)}</textarea><div class="m">${String(c.narration || '').length}자 · 약 ${(String(c.narration || '').length / 6.5).toFixed(1)}초</div></td>
+    <td><textarea data-i="${i}" data-f="caption">${esc(c.caption)}</textarea></td>
+    <td><input data-i="${i}" data-f="seconds" type="number" step="0.5" min="0.5" value="${c.seconds}" style="width:62px"></td>
+    <td><button class="sm" data-op="up" data-i="${i}" title="위로">↑</button><button class="sm" data-op="down" data-i="${i}" title="아래로">↓</button><button class="sm" data-op="add" data-i="${i}" title="아래에 장면 추가">＋</button><button class="sm" data-op="del" data-i="${i}" title="삭제">🗑</button></td></tr>`).join('')}
+   </table>
+   <div class="row" style="margin-top:12px"><label class="grow"><span>해시태그</span><input data-sf="hashtags" value="${esc((s.hashtags || []).join(' '))}"></label></div>
+   <div class="row"><label class="grow"><span>설명란</span><textarea data-sf="description" rows="3">${esc(s.description || '')}</textarea></label>
+    <label class="grow"><span>고정 댓글</span><textarea data-sf="pinnedComment" rows="3">${esc(s.pinnedComment || '')}</textarea></label></div>
+   ${s.appliedKnowhow?.length ? `<details><summary class="hint" style="cursor:pointer">이 대본에 적용한 노하우 보기</summary><ul class="hint">${s.appliedKnowhow.map(x => `<li>${esc(x)}</li>`).join('')}</ul></details>` : ''}
+  </div>`;
+}
+function onSceneInput(e) {
+  const t = e.target, s = PJ.script; if (!s) return;
+  if (t.dataset.f) {
+    const i = +t.dataset.i, f = t.dataset.f;
+    s.scenes[i][f] = f === 'seconds' ? (+t.value || 3) : t.value;
+    if (f === 'narration' && t.nextElementSibling?.classList.contains('m')) t.nextElementSibling.textContent = `${t.value.length}자 · 약 ${(t.value.length / 6.5).toFixed(1)}초`;
+  } else if (t.dataset.sf) s[t.dataset.sf] = t.dataset.sf === 'hashtags' ? t.value.split(/\s+/).filter(Boolean) : t.value;
+  else return;
+  saveSoon();
+}
+function sceneOp(op, i) {
+  const S = PJ.script?.scenes; if (!S) return;
+  const arrs = [S, PJ.audio, PJ.media], sw = (a, x, y) => { const t = a[x]; a[x] = a[y]; a[y] = t; };
+  if (op === 'up' && i > 0) arrs.forEach(a => sw(a, i, i - 1));
+  else if (op === 'down' && i < S.length - 1) arrs.forEach(a => sw(a, i, i + 1));
+  else if (op === 'del') { if (!confirm(`${i + 1}번 장면을 삭제할까요?`)) return; arrs.forEach(a => a.splice(i, 1)); }
+  else if (op === 'add') { S.splice(i + 1, 0, { visual: '', narration: '', caption: '', seconds: 3 }); PJ.audio.splice(i + 1, 0, null); PJ.media.splice(i + 1, 0, null); }
+  else return;
+  PJ.video = null; saveP(); refresh();
+}
+async function genScript() {
+  const f = getForm();
+  if (!f.name && !PJ.product) { alert('상품명을 입력하거나, 쇼핑 상품 찾기에서 참고할 영상을 고르세요.'); throw new Error('no product'); }
+  $('#sGen').disabled = $('#sAuto').disabled = true;
+  setSt('#sSt', '', '⏳ AI가 노하우를 적용해서 대본을 쓰는 중…');
+  try {
+    const p = PJ.product;
+    const info = { 상품명: f.name || '(참고 영상에서 추론할 것)', 특징_장점: f.feat, 가격_구매처_혜택: f.price, 타깃: f.target, 영상길이_초: f.len, 말투: f.tone, 추가요청: f.extra,
+      참고영상: p ? { 플랫폼: PF[p.platform], 제목: p.title, 설명: p.description, 조회수: p.views, 좋아요: p.likes, 댓글수: p.comments, 채널구독자: p.followers, 쇼핑신호: p.shopSignals, 구매의도_댓글: p.topComments } : null };
+    const n = Math.max(4, Math.round(f.len / 4));
+    const prompt = `아래 상품으로 한국어 쇼핑 숏폼 대본을 만들어라.
+[상품 정보]
+${JSON.stringify(info, null, 1)}
+
+규칙:
+- [제작 노하우 가이드]의 후킹·대본 구조·장면 배치·자막·말투·CTA 규칙을 그대로 적용한다
+- 구매의도 댓글이 있으면 사람들이 궁금해한 점(어디서 사는지, 가격, 제품명 등)을 대본에 반영한다
+- 내레이션 전체 길이는 약 ${f.len}초 (한국어는 1초에 6~7글자)
+- 장면은 ${n}개 안팎, 각 장면의 seconds는 그 장면 내레이션을 읽는 시간
+- 참고 영상의 문장을 그대로 베끼지 않는다. 확인되지 않은 효능·수치·가격은 지어내지 않는다 (모르면 일반적인 표현 사용)
+- visual에는 이 장면에서 보여줄 화면을 촬영자가 바로 찍을 수 있게 구체적으로 적는다
+JSON만 출력:
+{"productName":"","angle":"이 대본의 소구 포인트 한 줄","title":"업로드용 영상 제목","scenes":[{"visual":"보여줄 화면","narration":"TTS로 읽을 문장","caption":"화면 상단 강조 자막(짧게)","seconds":3}],"hashtags":["#태그"],"description":"업로드 설명란 글","pinnedComment":"고정 댓글 문구","appliedKnowhow":["이 대본에 적용한 노하우 규칙"]}`;
+    const j = await gem('text', {
+      systemInstruction: { parts: [{ text: '너는 한국 쇼핑 숏폼(유튜브 쇼츠·인스타 릴스·틱톡) 전문 대본 작가다. 아래 [제작 노하우 가이드]를 최우선 규칙으로 따른다.\n\n[제작 노하우 가이드]\n' + (PJ.knowhow || DEFAULT_GUIDE) }] },
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      generationConfig: { responseMimeType: 'application/json', temperature: 0.9 }
+    }, m => setSt('#sSt', 'warn', esc(m)));
+    const s = parseJSON(gemText(j));
+    if (!Array.isArray(s.scenes) || !s.scenes.length) throw new Error('대본에 장면이 없습니다. 다시 시도해 주세요.');
+    s.scenes = s.scenes.map(x => ({ visual: String(x.visual || ''), narration: String(x.narration || ''), caption: String(x.caption || ''), seconds: +x.seconds || 3 }));
+    s.hashtags = Array.isArray(s.hashtags) ? s.hashtags.map(String) : String(s.hashtags || '').split(/\s+/).filter(Boolean);
+    if (!f.name && s.productName) $('#spName').value = s.productName;
+    PJ.script = s; PJ.audio = []; PJ.video = null;
+    saveP(); renderScript();
+    setSt('#sSt', 'ok', `✅ 대본 완성 (${s.scenes.length}개 장면). 아래에서 직접 고칠 수 있고, 다 되면 <b>다음: 음성 만들기</b>를 누르세요.`);
+  } catch (e) { setSt('#sSt', 'err', '❌ ' + esc(e.message)); throw e; }
+  finally { $('#sGen').disabled = $('#sAuto').disabled = false; }
+}
+function scriptText() {
+  const s = PJ.script; if (!s) return '';
+  return [`[제목] ${s.title || ''}`, '', ...s.scenes.map((c, i) => `#${i + 1} (${c.seconds}초)\n화면: ${c.visual}\n내레이션: ${c.narration}\n자막: ${c.caption}`), '',
+    `[해시태그] ${(s.hashtags || []).join(' ')}`, `[설명] ${s.description || ''}`, `[고정댓글] ${s.pinnedComment || ''}`].join('\n');
+}
+
+// ------------------------------------------------------------ 3. TTS
+const VOICES = [['Kore', '단단하고 또렷함'], ['Aoede', '산뜻하고 가벼움'], ['Leda', '젊고 발랄함'], ['Zephyr', '밝음'], ['Autonoe', '밝음'], ['Laomedeia', '신남'],
+  ['Puck', '경쾌함'], ['Fenrir', '들뜬 느낌'], ['Achird', '친근함'], ['Sadachbia', '생기 있음'], ['Charon', '차분한 설명'], ['Orus', '단단함'], ['Schedar', '고른 톤'], ['Umbriel', '편안함']];
+async function blobDur(blob) { try { const b = await new OfflineAudioContext(1, 1, 44100).decodeAudioData(await blob.arrayBuffer()); return b.duration; } catch { return 0; } }
+async function tts(text, note) {
+  const voice = $('#tVoice').value || 'Kore', style = $('#tStyle').value.trim();
+  const j = await gem('tts', { contents: [{ parts: [{ text: style ? `${style}: ${text}` : text }] }],
+    generationConfig: { responseModalities: ['AUDIO'], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: voice } } } } }, note);
+  const part = (j?.candidates?.[0]?.content?.parts || []).find(p => p.inlineData?.data);
+  if (!part) throw new Error('음성 데이터를 받지 못했습니다: ' + JSON.stringify(j).slice(0, 200));
+  const mt = part.inlineData.mimeType || '', bytes = b64ToBytes(part.inlineData.data);
+  if (/wav|mpeg|mp3|ogg/i.test(mt)) { const blob = new Blob([bytes], { type: mt.split(';')[0] }); return { blob, dur: await blobDur(blob) }; }
+  const rate = +(mt.match(/rate=(\d+)/)?.[1] || 24000);
+  return { blob: wavFromPCM16(bytes, rate), dur: bytes.byteLength / 2 / rate };
+}
+function renderTTS() {
+  const sc = PJ.script?.scenes || [];
+  if (!sc.length) { $('#tOut').innerHTML = '<p class="hint">먼저 대본을 만들어 주세요. <button data-go2="script">✍️ 대본 만들기로</button></p>'; $('#tSum').textContent = ''; return; }
+  let tot = 0;
+  $('#tOut').innerHTML = `<table class="sc"><tr><th>#</th><th>내레이션 (여기서 고쳐도 대본에 반영)</th><th style="width:320px">음성</th><th></th></tr>${sc.map((s, i) => {
+    const a = PJ.audio[i], ok = a && a.text === s.narration; if (ok) tot += a.dur;
+    return `<tr><td>${i + 1}</td><td><textarea data-i="${i}" data-f="narration">${esc(s.narration)}</textarea></td>
+     <td id="ta${i}">${!String(s.narration || '').trim() ? '<span class="m">내레이션 없음 (무음)</span>' : ok ? `<audio controls src="${a.url}" style="width:100%"></audio><div class="m">${a.dur.toFixed(1)}초</div>` : a ? '<span class="m">문장이 바뀌어서 다시 만들어야 해요</span>' : '<span class="m">아직 없음</span>'}</td>
+     <td><button class="sm" data-tone="${i}">🔊 만들기</button></td></tr>`; }).join('')}</table>`;
+  $('#tSum').textContent = tot ? `현재 음성 합계 ${tot.toFixed(1)}초` : '';
+}
+async function ttsOne(i) {
+  const s = PJ.script.scenes[i]; if (!String(s.narration || '').trim()) { PJ.audio[i] = null; return; }
+  const cell = $('#ta' + i); if (cell) cell.innerHTML = '<span class="m">⏳ 만드는 중…</span>';
+  const r = await tts(s.narration, m => setSt('#tSt', 'warn', esc(m)));
+  if (PJ.audio[i]?.url) URL.revokeObjectURL(PJ.audio[i].url);
+  PJ.audio[i] = { ...r, text: s.narration, url: URL.createObjectURL(r.blob) }; PJ.video = null;
+}
+async function ttsAll() {
+  const sc = PJ.script?.scenes || []; if (!sc.length) { alert('먼저 대본을 만들어 주세요.'); throw new Error('no script'); }
+  $('#tAll').disabled = true; let made = 0;
+  try {
+    for (let i = 0; i < sc.length; i++) {
+      if (audioOk(i)) continue;
+      setSt('#tSt', '', `⏳ ${i + 1}/${sc.length}번 장면 음성 만드는 중…`);
+      await ttsOne(i); made++; renderTTS(); await sleep(400);
+    }
+    setSt('#tSt', 'ok', `✅ 음성 준비 완료 (${made}개 새로 만듦). <b>다음: 영상 만들기</b>로 가세요.`);
+  } catch (e) { setSt('#tSt', 'err', '❌ ' + esc(e.message)); renderTTS(); throw e; }
+  finally { $('#tAll').disabled = false; updateNav(); }
+}
+
+// ------------------------------------------------------------ 4. 영상
+const FONT = '"Pretendard","Malgun Gothic","Apple SD Gothic Neo","Noto Sans KR",sans-serif';
+function setMedia(i, file) {
+  if (PJ.media[i]?.url) URL.revokeObjectURL(PJ.media[i].url);
+  const url = URL.createObjectURL(file), type = file.type.startsWith('video') ? 'video' : 'image';
+  let el;
+  if (type === 'image') { el = new Image(); el.onload = () => previewFrame(); el.src = url; }
+  else { el = document.createElement('video'); el.muted = true; el.playsInline = true; el.loop = true; el.preload = 'auto'; el.onloadeddata = () => previewFrame(); el.src = url; }
+  PJ.media[i] = { name: file.name, url, type, el }; PJ.video = null;
+}
+function renderVideoPage() {
+  const sc = PJ.script?.scenes || [];
+  if (!sc.length) { $('#vList').innerHTML = '<p class="hint">먼저 대본을 만들어 주세요. <button data-go2="script">✍️ 대본 만들기로</button></p>'; previewFrame(); return; }
+  const miss = sc.filter((s, i) => !audioOk(i)).length;
+  $('#vList').innerHTML = (miss ? `<div class="msg warn">음성이 없는 장면이 ${miss}개 있어요. <button class="sm" data-go2="tts">🔊 음성 만들러 가기</button> (그대로 만들면 그 장면은 무음)</div>` : '') +
+   `<table class="sc"><tr><th>#</th><th>소스</th><th>장면 내용</th><th class="n">길이</th><th>순서</th></tr>${sc.map((s, i) => {
+    const m = PJ.media[i], th = m ? (m.type === 'image' ? `<img class="mth" src="${m.url}">` : `<video class="mth" src="${m.url}" muted></video>`) : '<div class="mth"></div>';
+    const a = audioOk(i) && PJ.audio[i] ? PJ.audio[i].dur.toFixed(1) + '초' : `<span class="m">${s.seconds}초(예상)</span>`;
+    return `<tr><td>${i + 1}</td><td>${th}<label class="btn sm">${m ? '바꾸기' : '파일'}<input type="file" accept="image/*,video/*" data-vf="${i}" hidden></label>${m ? `<button class="sm" data-vx="${i}">✕</button>` : ''}</td>
+     <td><div class="m">🎥 ${esc(s.visual)}</div><div>🗣 ${esc(s.narration)}</div>${s.caption ? `<span class="tag k">${esc(s.caption)}</span>` : ''}</td>
+     <td class="n">${a}</td><td><button class="sm" data-op="up" data-i="${i}">↑</button><button class="sm" data-op="down" data-i="${i}">↓</button></td></tr>`; }).join('')}</table>`;
+  previewFrame();
+}
+function wrapText(g, text, maxW) {
+  const out = []; let line = '';
+  for (const w of String(text).split(/(\s+)/)) {
+    if (!w) continue;
+    if (g.measureText(line + w).width <= maxW) { line += w; continue; }
+    if (line.trim()) out.push(line.trim()); line = '';
+    if (g.measureText(w).width > maxW) { for (const ch of w) { if (g.measureText(line + ch).width > maxW) { out.push(line); line = ''; } line += ch; } }
+    else line = /^\s+$/.test(w) ? '' : w;
+  }
+  if (line.trim()) out.push(line.trim());
+  return out;
+}
+function subChunks(t) {
+  const words = String(t).trim().split(/\s+/).filter(Boolean), out = []; let cur = '';
+  for (const w of words) {
+    if (cur && (cur + ' ' + w).length > 16) { out.push(cur); cur = w; } else cur = cur ? cur + ' ' + w : w;
+    if (/[.!?~…]$/.test(w)) { out.push(cur); cur = ''; }
+  }
+  if (cur) out.push(cur);
+  return out.length ? out : [String(t)];
+}
+function fillRound(g, x, y, w, h, r) { g.beginPath(); if (g.roundRect) g.roundRect(x, y, w, h, r); else g.rect(x, y, w, h); g.fill(); }
+function vOpts() { return { subs: $('#vSubs').checked, cap: $('#vCap').checked, fit: $('#vFit').value, name: getForm().name || PJ.script?.productName || '' }; }
+function drawFrame(g, i, lt, d, o) {
+  const W = 1080, H = 1920, s = PJ.script?.scenes?.[i] || {}, m = PJ.media[i];
+  g.save(); g.filter = 'none'; g.fillStyle = '#111'; g.fillRect(0, 0, W, H);
+  const el = m?.el, sw = m ? (m.type === 'video' ? el.videoWidth : el.naturalWidth) : 0, sh = m ? (m.type === 'video' ? el.videoHeight : el.naturalHeight) : 0;
+  if (sw && sh) {
+    const z = m.type === 'image' ? 1 + 0.07 * Math.min(1, lt / Math.max(d, 0.1)) : 1;
+    const put = (scale, blur) => { const w = sw * scale * z, h = sh * scale * z; g.filter = blur ? 'blur(40px) brightness(0.55)' : 'none'; g.drawImage(el, (W - w) / 2, (H - h) / 2, w, h); };
+    if (o.fit === 'contain') { put(Math.max(W / sw, H / sh), true); put(Math.min(W / sw, H / sh), false); } else put(Math.max(W / sw, H / sh), false);
+    g.filter = 'none';
+  } else {
+    const gr = g.createLinearGradient(0, 0, W, H); gr.addColorStop(0, '#ff4d6d'); gr.addColorStop(1, '#6a3df0'); g.fillStyle = gr; g.fillRect(0, 0, W, H);
+    g.fillStyle = '#fff'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.font = `900 96px ${FONT}`;
+    const ls = wrapText(g, o.name || '상품 이미지를 넣어주세요', W - 160).slice(0, 4);
+    ls.forEach((ln, k) => g.fillText(ln, W / 2, H / 2 - (ls.length - 1) * 60 + k * 120));
+  }
+  g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineJoin = 'round';
+  if (o.cap && s.caption) {
+    g.font = `900 82px ${FONT}`;
+    wrapText(g, s.caption, W - 200).slice(0, 3).forEach((ln, k) => {
+      const y = 260 + k * 118, tw = g.measureText(ln).width;
+      g.fillStyle = '#ffe600'; fillRound(g, W / 2 - tw / 2 - 32, y - 62, tw + 64, 116, 20);
+      g.fillStyle = '#111'; g.fillText(ln, W / 2, y);
+    });
+  }
+  if (o.subs && s.narration) {
+    const ch = subChunks(s.narration), tot = ch.reduce((a, c) => a + c.length, 0) || 1, sp = Math.max(0.1, o.speech || d);
+    let acc = 0, cur = ch[ch.length - 1];
+    for (const c of ch) { acc += c.length; if (lt <= sp * acc / tot) { cur = c; break; } }
+    g.font = `900 72px ${FONT}`;
+    wrapText(g, cur, W - 140).slice(0, 2).forEach((ln, k) => { const y = H * 0.74 + k * 94; g.lineWidth = 16; g.strokeStyle = '#000'; g.strokeText(ln, W / 2, y); g.fillStyle = '#fff'; g.fillText(ln, W / 2, y); });
+  }
+  g.restore();
+}
+function previewFrame() { const cv = $('#vCanvas'); if (!cv || rendering) return; drawFrame(cv.getContext('2d'), 0, 0, 3, vOpts()); }
+let rendering = false;
+async function renderVideo() {
+  const sc = PJ.script?.scenes || [];
+  if (!sc.length) return alert('먼저 대본을 만들어 주세요.');
+  if (typeof MediaRecorder === 'undefined') return alert('이 브라우저는 영상 저장을 지원하지 않습니다. 크롬이나 엣지를 써주세요.');
+  const miss = sc.filter((s, i) => !audioOk(i)).length;
+  if (miss && !confirm(`음성이 없는 장면이 ${miss}개 있어요. 그 장면은 무음으로 만들까요?`)) return;
+  rendering = true; $('#vGo').disabled = true; $('#vOut').innerHTML = '';
+  const ctx = new AudioContext(), mediaUsed = [];
+  try {
+    await Promise.race([ctx.resume(), sleep(3000)]);
+    if (ctx.state !== 'running') throw new Error('브라우저가 소리 재생을 막았습니다. 🎬 영상 만들기 버튼을 다시 한 번 눌러주세요.');
+    setSt('#vSt', '', '⏳ 준비 중…');
+    const bufs = [], speech = [];
+    for (let i = 0; i < sc.length; i++) {
+      const a = PJ.audio[i];
+      if (a && a.text === sc[i].narration && String(sc[i].narration || '').trim()) { bufs[i] = await ctx.decodeAudioData(await a.blob.arrayBuffer()); speech[i] = bufs[i].duration; }
+    }
+    const durs = sc.map((s, i) => bufs[i] ? bufs[i].duration + 0.25 : Math.max(1, +s.seconds || 3));
+    const starts = []; let total = 0; durs.forEach(d => { starts.push(total); total += d; });
+    const rate = ctx.sampleRate, merged = ctx.createBuffer(1, Math.ceil((total + 0.5) * rate), rate), out = merged.getChannelData(0);
+    bufs.forEach((b, i) => { if (!b) return; const off = Math.floor(starts[i] * rate); for (let ch = 0; ch < b.numberOfChannels; ch++) { const d = b.getChannelData(ch); for (let k = 0; k < d.length && off + k < out.length; k++) out[off + k] += d[k] / b.numberOfChannels; } });
+    // 영상 소스 준비
+    for (const m of PJ.media) if (m?.type === 'video') { m.el.pause(); m.el.currentTime = 0; mediaUsed.push(m.el); }
+    const cv = $('#vCanvas'), g = cv.getContext('2d'), o = vOpts();
+    drawFrame(g, 0, 0, durs[0], { ...o, speech: speech[0] });
+    const stream = cv.captureStream(30), dest = ctx.createMediaStreamDestination();
+    const src = ctx.createBufferSource(); src.buffer = merged; src.connect(dest);
+    const mon = $('#vMon').checked; if (mon) src.connect(ctx.destination);
+    let bgmSrc = null;
+    if (PJ.bgm) {
+      try { const bb = await ctx.decodeAudioData(await PJ.bgm.arrayBuffer()); bgmSrc = ctx.createBufferSource(); bgmSrc.buffer = bb; bgmSrc.loop = true;
+        const gn = ctx.createGain(); gn.gain.value = +$('#vBgmVol').value; bgmSrc.connect(gn); gn.connect(dest); if (mon) gn.connect(ctx.destination);
+      } catch { setSt('#vSt', 'warn', '배경음악 파일을 읽지 못해 빼고 만듭니다.'); bgmSrc = null; }
+    }
+    dest.stream.getAudioTracks().forEach(t => stream.addTrack(t));
+    const mime = ['video/mp4;codecs=avc1.42E01F,mp4a.40.2', 'video/mp4;codecs=avc1,mp4a.40.2', 'video/mp4', 'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'].find(t => MediaRecorder.isTypeSupported(t)) || '';
+    const rec = new MediaRecorder(stream, mime ? { mimeType: mime, videoBitsPerSecond: 8e6 } : undefined), chunks = [];
+    rec.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
+    const stopped = new Promise(r => { rec.onstop = r; });
+    rec.start(500);
+    const t0 = ctx.currentTime + 0.15; src.start(t0); bgmSrc?.start(t0);
+    let cur = -1;
+    await new Promise(res => {
+      const tick = () => {
+        const t = ctx.currentTime - t0;
+        if (t >= total + 0.2) return res();
+        const tt = Math.max(0, Math.min(t, total - 0.001)); let i = 0; while (i < sc.length - 1 && tt >= starts[i + 1]) i++;
+        if (i !== cur) {
+          const pm = PJ.media[cur]; if (pm?.type === 'video') pm.el.pause();
+          cur = i; const m = PJ.media[i]; if (m?.type === 'video') { m.el.currentTime = 0; m.el.play().catch(() => {}); }
+        }
+        drawFrame(g, i, tt - starts[i], durs[i], { ...o, speech: speech[i] });
+        $('#vProg').style.width = (100 * tt / total).toFixed(1) + '%';
+        setSt('#vSt', '', `🎬 만드는 중… ${tt.toFixed(1)} / ${total.toFixed(1)}초 (${i + 1}/${sc.length}번 장면)`);
+        setTimeout(tick, 1000 / 30);
+      };
+      tick();
+    });
+    rec.stop(); await stopped;
+    try { src.stop(); bgmSrc?.stop(); } catch {}
+    const type = (rec.mimeType || mime || 'video/webm').split(';')[0], ext = type.includes('mp4') ? 'mp4' : 'webm';
+    const blob = new Blob(chunks, { type }), url = URL.createObjectURL(blob);
+    const name = `${(getForm().name || PJ.script.productName || '쇼핑숏폼').replace(/[\\/:*?"<>|\s]+/g, '_')}_${new Date().toISOString().slice(0, 10)}.${ext}`;
+    if (PJ.video?.url) URL.revokeObjectURL(PJ.video.url);
+    PJ.video = { url, name, size: blob.size, dur: total };
+    $('#vOut').innerHTML = `<video controls src="${url}" style="width:100%;border-radius:10px;margin-top:8px"></video>
+      <a class="btn pri" style="display:block;text-align:center;margin-top:8px;padding:10px;border-radius:8px;background:#ff4d6d;color:#fff;font-weight:700;text-decoration:none" download="${esc(name)}" href="${url}">⬇️ 영상 저장 (${ext.toUpperCase()}, ${(blob.size / 1e6).toFixed(1)}MB)</a>
+      ${ext === 'webm' ? '<p class="hint">WEBM 파일은 유튜브·틱톡에 그대로 올릴 수 있어요. MP4가 필요하면 CapCut 등에서 변환하세요.</p>' : ''}
+      <button class="sm" id="vCopy" style="margin-top:6px">📋 제목·설명·해시태그·고정댓글 복사</button>`;
+    $('#vProg').style.width = '100%';
+    setSt('#vSt', 'ok', `✅ 영상 완성! ${total.toFixed(1)}초`);
+    updateNav();
+  } catch (e) { setSt('#vSt', 'err', '❌ ' + esc(e.message)); }
+  finally { mediaUsed.forEach(v => v.pause()); ctx.close().catch(() => {}); rendering = false; $('#vGo').disabled = false; }
+}
+
+// ------------------------------------------------------------ 이벤트 연결
+$$('nav a[data-go]').forEach(a => a.onclick = () => go(a.dataset.go));
+document.addEventListener('click', e => {
+  const g2 = e.target.closest('[data-go2]'); if (g2) { e.preventDefault(); return go(g2.dataset.go2); }
+  const op = e.target.closest('[data-op]'); if (op) return sceneOp(op.dataset.op, +op.dataset.i);
+  if (e.target.closest('[data-clearprod]')) { PJ.product = null; saveP(); return renderScript(); }
+  const to = e.target.closest('[data-tone]'); if (to) { const i = +to.dataset.tone; to.disabled = true; ttsOne(i).then(() => setSt('#tSt', 'ok', `✅ ${i + 1}번 장면 음성 완료`)).catch(er => setSt('#tSt', 'err', '❌ ' + esc(er.message))).finally(() => { renderTTS(); updateNav(); }); return; }
+  const vx = e.target.closest('[data-vx]'); if (vx) { const i = +vx.dataset.vx; if (PJ.media[i]?.url) URL.revokeObjectURL(PJ.media[i].url); PJ.media[i] = null; PJ.video = null; return renderVideoPage(); }
+  if (e.target.id === 'sCopy') { navigator.clipboard.writeText(scriptText()).then(() => setSt('#sSt', 'ok', '📋 대본을 복사했습니다.')); }
+  if (e.target.id === 'vCopy') { const s = PJ.script; navigator.clipboard.writeText([s.title, '', s.description, '', (s.hashtags || []).join(' '), '', '[고정댓글] ' + (s.pinnedComment || '')].join('\n')).then(() => setSt('#vSt', 'ok', '📋 업로드용 글을 복사했습니다.')); }
+});
+document.addEventListener('change', e => {
+  const vf = e.target.closest('[data-vf]'); if (vf && vf.files[0]) { setMedia(+vf.dataset.vf, vf.files[0]); renderVideoPage(); }
+});
+$('#sOut').addEventListener('input', onSceneInput);
+$('#tOut').addEventListener('input', onSceneInput);
+FORM_IDS.forEach(id => $('#' + id).addEventListener('input', saveSoon));
+$('#sGen').onclick = () => genScript().catch(() => {});
+$('#sAuto').onclick = async () => {
+  try { await genScript(); go('tts'); await ttsAll(); go('video'); setSt('#vSt', 'ok', '✅ 대본과 음성이 준비됐어요. 장면별 사진·영상을 넣고 🎬 영상 만들기를 누르세요.'); } catch {}
+};
+$('#kDir').onchange = e => { addKFiles(e.target.files); e.target.value = ''; };
+$('#kPick').onchange = e => { addKFiles(e.target.files); e.target.value = ''; };
+$('#kGo').onclick = analyzeAll;
+$('#kMerge').onclick = () => mergeKnow().catch(e => setSt('#kSt', 'err', '❌ ' + esc(e.message)));
+$('#kClear').onclick = () => { kFiles = []; setSt('#kSt', '', ''); renderKnow(); };
+$('#kSave').onclick = () => { PJ.knowhow = $('#kText').value.trim(); saveP(); setSt('#kSt', 'ok', '💾 노하우 가이드를 저장했습니다.'); };
+$('#tVoice').onchange = () => localStorage.setItem('ssf.voice', $('#tVoice').value);
+$('#tStyle').oninput = () => localStorage.setItem('ssf.style', $('#tStyle').value);
+$('#tAll').onclick = () => ttsAll().catch(() => {});
+$('#tSample').onclick = async () => {
+  $('#tSample').disabled = true; setSt('#tSt', '', '⏳ 미리 듣기 음성 만드는 중…');
+  try { const r = await tts('안녕하세요! 오늘 소개할 꿀템은 바로 이거예요.', m => setSt('#tSt', 'warn', esc(m))); const a = $('#tSampleAudio'); a.src = URL.createObjectURL(r.blob); await a.play(); setSt('#tSt', 'ok', `▶ ${$('#tVoice').value} 목소리`); }
+  catch (e) { setSt('#tSt', 'err', '❌ ' + esc(e.message)); } finally { $('#tSample').disabled = false; }
+};
+$('#vBulk').onchange = e => {
+  const files = [...e.target.files], sc = PJ.script?.scenes || []; e.target.value = '';
+  if (!sc.length) return alert('먼저 대본을 만들어 주세요.');
+  let k = 0; for (let i = 0; i < sc.length && k < files.length; i++) if (!PJ.media[i]) setMedia(i, files[k++]);
+  for (let i = 0; i < sc.length && k < files.length; i++) setMedia(i, files[k++]);
+  setSt('#vSt', k < files.length ? 'warn' : 'ok', `${k}개 파일을 장면에 넣었습니다.${k < files.length ? ` (장면보다 파일이 많아 ${files.length - k}개는 빠졌어요)` : ''}`);
+  renderVideoPage();
+};
+$('#vBgm').onchange = e => { PJ.bgm = e.target.files[0] || null; };
+['#vSubs', '#vCap', '#vFit'].forEach(s => $(s).addEventListener('change', previewFrame));
+$('#vGo').onclick = renderVideo;
+
+load(); loadP(); go(localStorage.getItem('ssf.page') || 'find');
 </script>
 </body>
 </html>
