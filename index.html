@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>숏폼 쇼핑 파인더</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:"Malgun Gothic","Apple SD Gothic Neo",sans-serif;background:#f4f5f8;color:#1d2130;font-size:14px}
+header{display:flex;align-items:center;gap:14px;padding:14px 24px;background:#1d2130;color:#fff;flex-wrap:wrap}header h1{margin:0;font-size:20px}header span{color:#aeb4c6;font-size:13px}
+main{padding:18px 24px 60px;max-width:1800px;margin:0 auto}.card{background:#fff;border:1px solid #e3e5ea;border-radius:12px;padding:16px 18px;margin-bottom:14px}
+.row{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:10px}.grow{flex:1;min-width:260px}.sp{flex:1}
+label{display:flex;flex-direction:column;gap:4px}label>span,.lbl{font-size:12px;color:#6b7185;font-weight:600}label.c{flex-direction:row;align-items:center;gap:6px;cursor:pointer;padding-bottom:6px}
+input,select,textarea{font:inherit;padding:8px 10px;border:1px solid #e3e5ea;border-radius:8px;background:#fff}textarea{width:100%;resize:vertical}
+button{font:inherit;cursor:pointer;border-radius:8px;border:1px solid #e3e5ea;background:#fff;padding:8px 14px}
+.pri{background:#ff4d6d;color:#fff;border-color:#ff4d6d;font-weight:700}.pri:disabled{opacity:.5}.big{padding:11px 26px;font-size:16px}
+.chip{border-radius:999px;padding:5px 11px;font-size:13px}.hint{color:#6b7185;font-size:12.5px;line-height:1.6;margin:4px 0 0}
+.b{display:inline-block;padding:2px 7px;border-radius:6px;color:#fff;font-size:11px;font-weight:700}.youtube{background:#f00}.tiktok{background:#111}.instagram{background:#d62976}.douyin{background:#fe2c55}
+.tag{display:inline-block;padding:1px 6px;margin:2px 3px 0 0;border-radius:5px;background:#fff1d6;color:#8a5a00;font-size:11px}.tag.k{background:#ffe3e8;color:#c2183c}
+.msg{padding:9px 12px;border-radius:8px;background:#fff;border:1px solid #e3e5ea;margin-bottom:6px}.err{background:#fff0f0;color:#b3261e}.ok{background:#effaf2;color:#1e6b36}.warn{background:#fffbe6;color:#7a5b00}
+.sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:14px}.sum div{background:#fff;border:1px solid #e3e5ea;border-radius:12px;padding:12px 14px}.sum b{font-size:22px;display:block}.sum small{color:#6b7185}
+.hid{display:none!important}.tw{overflow:auto;max-height:75vh;border:1px solid #e3e5ea;border-radius:8px}table{border-collapse:collapse;width:100%}
+th,td{padding:8px 9px;border-bottom:1px solid #e3e5ea;text-align:left;vertical-align:top}th{position:sticky;top:0;background:#f8f9fb;font-size:12px;color:#6b7185;white-space:nowrap;cursor:pointer}
+th.on{color:#ff4d6d}.n{text-align:right;white-space:nowrap}td.w{min-width:280px;max-width:460px}td.w a{color:#1d2130;font-weight:600;text-decoration:none}.m{color:#6b7185;font-size:12px}
+.th{width:54px;height:86px;object-fit:cover;border-radius:6px;background:#eee}.it{font-weight:800;color:#ff4d6d;cursor:pointer;text-decoration:underline dotted}.it.z{color:#bbb;font-weight:400;cursor:default;text-decoration:none}.hot{color:#d9480f;font-weight:800}
+dialog{border:none;border-radius:14px;padding:20px 22px;width:min(660px,94vw);box-shadow:0 20px 60px rgba(0,0,0,.25)}dialog label{margin-bottom:12px}
+.cm{padding:8px 10px;border-bottom:1px solid #e3e5ea}.cms{max-height:55vh;overflow:auto;border:1px solid #e3e5ea;border-radius:8px}mark{background:#ffe066}
+</style>
+</head>
+<body>
+<header><h1>🛍️ 숏폼 쇼핑 파인더</h1><span>YouTube · TikTok · Instagram · Douyin 인기영상 + "어디서 사요?" 댓글 분석</span><span class="sp"></span><button id="bSet">⚙️ API 키 설정</button></header>
+<main>
+<section class="card">
+ <div class="row"><label class="grow"><span>검색 키워드</span><input id="q" placeholder="예) 살림템, 다이소 꿀템, 주방용품, 자취템" style="font-size:16px"></label><button id="bGo" class="pri big">🔍 검색</button></div>
+ <div class="row"><span class="lbl">플랫폼</span>
+  <label class="c"><input type="checkbox" name="pf" value="youtube" checked> YouTube</label>
+  <label class="c"><input type="checkbox" name="pf" value="tiktok"> TikTok</label>
+  <label class="c"><input type="checkbox" name="pf" value="instagram"> Instagram</label>
+  <label class="c"><input type="checkbox" name="pf" value="douyin"> Douyin(抖音)</label>
+  <label class="c" style="color:#8a6d00"><input type="checkbox" id="demo"> 데모 데이터 (키 없이 미리보기)</label></div>
+ <div class="row">
+  <label><span>플랫폼당 개수</span><select id="lim"><option>20</option><option selected>50</option><option>100</option><option>200</option></select></label>
+  <label><span>기간</span><select id="per"><option value="0">전체</option><option value="7">최근 7일</option><option value="30" selected>최근 30일</option><option value="90">최근 90일</option><option value="365">최근 1년</option></select></label>
+  <label><span>YouTube 검색순서</span><select id="ord"><option value="viewCount">조회수순</option><option value="relevance">관련도순</option><option value="date">최신순</option></select></label>
+  <label><span>YouTube 지역</span><select id="reg"><option value="KR|ko">한국</option><option value="US|en">미국</option><option value="JP|ja">일본</option><option value="|">전체</option></select></label>
+  <label class="c"><input type="checkbox" id="short" checked> 쇼츠/릴스만 (3분 이하)</label></div>
+ <div class="row"><label class="grow"><span>댓글 키워드 (쉼표로 구분 · 띄어쓰기/문장부호 무시)</span><textarea id="kw" rows="2"></textarea></label></div>
+ <div class="row"><span class="lbl">프리셋</span>
+  <button class="chip" data-p="ko">🇰🇷 한국어</button><button class="chip" data-p="zh">🇨🇳 중국어</button><button class="chip" data-p="en">🇺🇸 영어</button><button class="chip" data-p="x">지우기</button><span class="sp"></span>
+  <label class="c"><input type="checkbox" id="scan" checked> 댓글 스캔</label>
+  <label><span>영상당 댓글</span><select id="cpv"><option>50</option><option selected>100</option><option>300</option><option>500</option></select></label></div>
+ <p class="hint">💡 플랫폼들은 "댓글 전체 검색"을 제공하지 않아서, 검색 키워드로 영상을 먼저 모은 뒤 각 영상의 인기 댓글에서 구매의도 키워드를 찾습니다. Instagram은 해시태그(공백 제거)로, Douyin은 중국어 키워드로 검색하세요.</p>
+</section>
+<section id="st"></section>
+<section id="sum" class="sum hid"></section>
+<section id="res" class="card hid">
+ <div class="row">
+  <input id="fT" placeholder="결과 내 검색 (제목/채널/댓글)" style="min-width:240px">
+  <label><span>최소 조회수</span><input id="fV" type="number" style="width:120px"></label>
+  <label><span>최소 구독자</span><input id="fF" type="number" style="width:120px"></label>
+  <label><span>최대 구독자</span><input id="fX" type="number" style="width:120px"></label>
+  <label class="c"><input type="checkbox" id="fI"> 구매의도 댓글 있는 영상만</label>
+  <label class="c"><input type="checkbox" id="fS"> 쇼핑링크/광고 영상만</label><span class="sp"></span>
+  <button id="bCsv">⬇️ CSV(엑셀) 저장</button></div>
+ <div class="tw"><table><thead><tr><th>#</th><th></th>
+  <th data-k="platform">플랫폼</th><th data-k="title">제목</th><th data-k="channelName">채널</th><th data-k="followers" class="n">구독자/팔로워</th>
+  <th data-k="publishedAt">업로드</th><th data-k="durationSec" class="n">길이</th><th data-k="views" class="n">조회수</th><th data-k="likes" class="n">좋아요</th>
+  <th data-k="comments" class="n">댓글</th><th data-k="engagement" class="n" title="(좋아요+댓글)/조회수">참여율</th><th data-k="vpf" class="n" title="조회수/구독자">떡상지수</th>
+  <th data-k="matchCount" class="n">구매의도 댓글</th><th data-k="intentRate" class="n">구매의도율</th></tr></thead><tbody id="tb"></tbody></table></div>
+</section>
+</main>
+
+<dialog id="dSet"><form method="dialog">
+ <h2 style="margin-top:0">⚙️ API 키 설정</h2>
+ <p class="hint">키는 이 브라우저에만 저장됩니다.</p>
+ <label><span>YouTube Data API v3 키 — <a href="https://console.cloud.google.com/apis/library/youtube.googleapis.com" target="_blank">발급하기</a> (무료)</span><input id="kYt" type="password" placeholder="AIza..."></label>
+ <label><span>Apify 토큰 (TikTok/Instagram/Douyin) — <a href="https://console.apify.com/settings/integrations" target="_blank">발급하기</a> (매달 $5 무료)</span><input id="kAp" type="password" placeholder="apify_api_..."></label>
+ <div class="row" style="justify-content:flex-end"><button value="x">취소</button><button id="bSave" class="pri" value="ok">저장</button></div>
+</form></dialog>
+<dialog id="dDet"><div id="det"></div><form method="dialog" class="row" style="justify-content:flex-end;margin-top:12px"><button class="pri">닫기</button></form></dialog>
+
+<script>
+'use strict';
+// ===================== 설정: TikTok/Instagram/Douyin 수집에 쓰는 Apify 도구 =====================
+const APIFY = {
+  tiktok:    { search:  ['clockworks/tiktok-scraper', v => ({ searchQueries:[v.q], resultsPerPage:v.limit, searchSection:'/video', shouldDownloadVideos:false, shouldDownloadCovers:false, shouldDownloadSubtitles:false, shouldDownloadSlideshowImages:false })],
+               comments:['clockworks/tiktok-comments-scraper', v => ({ postURLs:v.urls, commentsPerPost:v.cpv, maxRepliesPerComment:0 })] },
+  instagram: { search:  ['apify/instagram-hashtag-scraper', v => ({ hashtags:[v.tag], resultsLimit:v.limit, resultsType:'reels' })],
+               comments:['apify/instagram-comment-scraper', v => ({ directUrls:v.urls, resultsLimit:v.cpv })],
+               profiles:['apify/instagram-profile-scraper', v => ({ usernames:v.users })] },
+  douyin:    { search:  ['zen-studio/douyin-search-scraper', v => ({ keywords:[v.q], maxResults:v.limit })],
+               comments:['zen-studio/douyin-comments-scraper', v => ({ videoUrls:v.urls, maxComments:v.cpv })] },
+};
+const PRESETS = {
+  ko:['어디서 사','어디서 샀','어디서 구매','어디서 파','어디꺼','어디 제품','제품명','제품 정보','정보 좀','정보좀','링크','구매','구입','사고 싶','사고싶','살 수 있','파는 곳','파는곳','얼마','가격','브랜드','쿠팡','품절','재입고','판매처','공구'],
+  zh:['哪里买','在哪买','哪买','链接','求链接','多少钱','同款','怎么买','想买','求购','店铺','橱窗'],
+  en:['where to buy','where can i buy','where did you get','link','need this','want this','how much','price','amazon'],
+};
+const PF = { youtube:'YouTube', tiktok:'TikTok', instagram:'Instagram', douyin:'Douyin' };
+
+// ===================== 공통 유틸 =====================
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => '\u0026#' + c.charCodeAt(0) + ';');
+const get = (o, p) => p.split('.').reduce((c, k) => c == null ? c : c[k], o);
+const pick = (o, ...ps) => { for (const p of ps) { const v = get(o, p); if (v != null && v !== '') return v; } };
+const num = (o, ...ps) => { for (const p of ps) { const v = get(o, p); if (v == null || v === '') continue; const n = Number(String(v).replace(/,/g,'')); if (isFinite(n)) return n; } return null; };
+const iso = v => { if (v == null || v === '') return null; if (/^\d+$/.test(String(v))) { let n = +v; if (n < 1e12) n *= 1000; v = n; } const d = new Date(v); return isNaN(d) ? null : d.toISOString(); };
+const chunk = (a, n) => Array.from({ length: Math.ceil(a.length / n) }, (_, i) => a.slice(i * n, i * n + n));
+async function mapLimit(items, lim, fn) { const out = []; let i = 0; await Promise.all(Array.from({ length: Math.min(lim, items.length) }, async () => { while (i < items.length) { const k = i++; try { out[k] = await fn(items[k]); } catch { out[k] = []; } } })); return out; }
+const squash = s => String(s || '').toLowerCase().replace(/[\s~!?.,·…'"`^*()\-_=+[\]{}|\\/:;<>]+/g, '');
+
+function matchComments(cs, kws) {
+  const K = kws.map(k => [k, squash(k)]).filter(k => k[1]);
+  return cs.map(c => { const s = squash(c.text); const h = K.filter(k => s.includes(k[1])).map(k => k[0]); return h.length ? { ...c, keywords: h } : null; })
+           .filter(Boolean).sort((a, b) => (b.likes || 0) - (a.likes || 0));
+}
+const SHOP = [[/coupa\.ng|link\.coupang|coupang\.com/i,'쿠팡링크'],[/쿠팡\s*파트너스|파트너스\s*활동/i,'쿠팡파트너스'],[/smartstore\.naver|brand\.naver|naver\.me/i,'네이버스토어'],
+  [/aliexpress|ali\.ski/i,'알리'],[/temu\./i,'테무'],[/amzn\.to|amazon\./i,'아마존'],[/shop\.tiktok|tiktok\.com\/view\/product/i,'틱톡샵'],[/#광고|유료\s*광고|협찬|#ad\b|#sponsored/i,'광고/협찬'],
+  [/프로필\s*링크|link\s*in\s*bio|고정\s*댓글/i,'프로필/고정댓글 링크'],[/购物车|小黄车|橱窗|同款/i,'抖音购物'],[/https?:\/\//i,'URL포함']];
+function finalize(it, comments, kws) {
+  const m = Array.isArray(comments) ? matchComments(comments, kws) : [];
+  return { ...it, engagement: it.views ? ((it.likes || 0) + (it.comments || 0)) / it.views : null,
+    vpf: it.followers && it.views != null ? it.views / it.followers : null,
+    commentsScanned: Array.isArray(comments) ? comments.length : null, matchCount: m.length,
+    intentRate: comments?.length ? m.length / comments.length : null, matchedComments: m.slice(0, 50),
+    shopSignals: SHOP.filter(([r]) => r.test(`${it.title}\n${it.description || ''}`)).map(x => x[1]) };
+}
+
+// ===================== YouTube (공식 API) =====================
+async function yt(path, params, key) {
+  const u = new URL('https://www.googleapis.com/youtube/v3/' + path);
+  for (const [k, v] of Object.entries(params)) if (v != null && v !== '') u.searchParams.set(k, v);
+  u.searchParams.set('key', key);
+  const r = await fetch(u); const j = await r.json().catch(() => ({}));
+  if (!r.ok) { const e = new Error(`YouTube 오류(${r.status}): ${j?.error?.message || r.statusText}`); e.reason = j?.error?.errors?.[0]?.reason; throw e; }
+  return j;
+}
+const dur = s => { const m = String(s || '').match(/P(?:(\d+)D)?T?(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/); return m ? (+m[1]||0)*86400 + (+m[2]||0)*3600 + (+m[3]||0)*60 + (+m[4]||0) : null; };
+async function ytComments(id, max, key) {
+  const out = []; let pt;
+  while (out.length < max) {
+    let j; try { j = await yt('commentThreads', { part:'snippet', videoId:id, maxResults:Math.min(100, max - out.length), order:'relevance', textFormat:'plainText', pageToken:pt }, key); }
+    catch (e) { if (['commentsDisabled','videoNotFound','forbidden'].includes(e.reason)) break; throw e; }
+    for (const t of j.items || []) { const s = t.snippet?.topLevelComment?.snippet || {}; out.push({ text: s.textDisplay || '', likes: s.likeCount || 0, author: s.authorDisplayName || '' }); }
+    if (!(pt = j.nextPageToken)) break;
+  }
+  return out;
+}
+async function searchYouTube(o, key) {
+  if (!key) throw new Error('YouTube API 키가 없습니다. 오른쪽 위 ⚙️ API 키 설정에서 입력하세요.');
+  const ids = []; let pt;
+  for (let p = 0; p < 5 && ids.length < o.limit; p++) {
+    const j = await yt('search', { part:'id', type:'video', q:o.q, maxResults:50, order:o.order, regionCode:o.region, relevanceLanguage:o.lang,
+      videoDuration:o.short ? 'short' : '', publishedAfter:o.days ? new Date(Date.now() - o.days * 864e5).toISOString() : '', pageToken:pt }, key);
+    for (const x of j.items || []) if (x.id?.videoId && !ids.includes(x.id.videoId)) ids.push(x.id.videoId);
+    if (!(pt = j.nextPageToken)) break;
+  }
+  const vids = [], ch = {};
+  for (const c of chunk(ids, 50)) vids.push(...(await yt('videos', { part:'snippet,statistics,contentDetails', id:c.join(',') }, key)).items || []);
+  for (const c of chunk([...new Set(vids.map(v => v.snippet?.channelId))], 50)) for (const x of (await yt('channels', { part:'statistics', id:c.join(',') }, key)).items || []) ch[x.id] = x;
+  let items = vids.map(v => { const s = v.snippet || {}, t = v.statistics || {}, c = ch[s.channelId], d = dur(v.contentDetails?.duration);
+    return { platform:'youtube', id:v.id, url: d <= 180 ? `https://www.youtube.com/shorts/${v.id}` : `https://www.youtube.com/watch?v=${v.id}`,
+      title:s.title || '', description:s.description || '', thumbnail:s.thumbnails?.high?.url || s.thumbnails?.default?.url || '',
+      channelName:s.channelTitle || '', channelUrl:`https://www.youtube.com/channel/${s.channelId}`,
+      followers: c && !c.statistics?.hiddenSubscriberCount ? +c.statistics.subscriberCount : null,
+      publishedAt:s.publishedAt, durationSec:d, views:t.viewCount != null ? +t.viewCount : null, likes:t.likeCount != null ? +t.likeCount : null, comments:t.commentCount != null ? +t.commentCount : null }; });
+  if (o.short) items = items.filter(i => i.durationSec == null || i.durationSec <= 180);
+  items = items.slice(0, o.limit);
+  let cm = {};
+  if (o.scan && o.kws.length) { const r = await mapLimit(items, 6, i => i.comments ? ytComments(i.id, o.cpv, key) : []); items.forEach((i, k) => cm[i.id] = r[k] || []); }
+  return items.map(i => finalize(i, cm[i.id] ?? null, o.kws));
+}
+
+// ===================== TikTok / Instagram / Douyin (Apify) =====================
+async function runActor(actor, input, token) {
+  if (!token) throw new Error('Apify 토큰이 없습니다. 오른쪽 위 ⚙️ API 키 설정에서 입력하세요.');
+  const u = new URL(`https://api.apify.com/v2/acts/${actor.replace('/', '~')}/run-sync-get-dataset-items`);
+  u.search = new URLSearchParams({ timeout: '280', clean: 'true', format: 'json', token });
+  const r = await fetch(u, { method:'POST', headers:{ 'content-type':'application/json' }, body:JSON.stringify(input) });
+  const t = await r.text();
+  if (!r.ok) { let m = t; try { m = JSON.parse(t).error.message; } catch {} throw new Error(`Apify(${actor}) 오류 ${r.status}: ${String(m).slice(0, 300)}`); }
+  const d = JSON.parse(t || '[]'); return Array.isArray(d) ? d : [];
+}
+const NORM = {
+  tiktok: x => { const id = String(pick(x,'id','aweme_id') || ''), u = pick(x,'authorMeta.name','author.uniqueId') || '';
+    return { platform:'tiktok', id, url:pick(x,'webVideoUrl','url') || `https://www.tiktok.com/@${u}/video/${id}`, title:pick(x,'text','desc') || '',
+      thumbnail:pick(x,'videoMeta.coverUrl','covers.default','cover') || '', channelName:pick(x,'authorMeta.nickName','author.nickname') || u, channelUrl:u ? `https://www.tiktok.com/@${u}` : '',
+      followers:num(x,'authorMeta.fans','author.followerCount','authorStats.followerCount'), publishedAt:iso(pick(x,'createTimeISO','createTime')), durationSec:num(x,'videoMeta.duration','video.duration'),
+      views:num(x,'playCount','stats.playCount'), likes:num(x,'diggCount','stats.diggCount'), comments:num(x,'commentCount','stats.commentCount') }; },
+  instagram: x => { const sc = pick(x,'shortCode','code') || '', u = pick(x,'ownerUsername','owner.username') || '';
+    return { platform:'instagram', id:String(pick(x,'id') || sc), sc, url:pick(x,'url') || `https://www.instagram.com/reel/${sc}/`, title:pick(x,'caption') || '',
+      thumbnail:pick(x,'displayUrl') || '', channelName:u, channelUrl:u ? `https://www.instagram.com/${u}/` : '', followers:num(x,'ownerFollowersCount'),
+      publishedAt:iso(pick(x,'timestamp')), durationSec:num(x,'videoDuration'), views:num(x,'videoPlayCount','videoViewCount','playCount'),
+      likes:num(x,'likesCount','likeCount'), comments:num(x,'commentsCount','commentCount'), _t:pick(x,'type','productType') }; },
+  douyin: x => { const id = String(pick(x,'aweme_id','awemeId','id','videoId') || ''), su = pick(x,'author.sec_uid','author.secUid'); let d = num(x,'video.duration','duration'); if (d > 1000) d = Math.round(d / 1000);
+    const it = { platform:'douyin', id, url:pick(x,'share_url','shareUrl','url','videoUrl') || `https://www.douyin.com/video/${id}`, title:pick(x,'desc','description','title','text') || '',
+      thumbnail:pick(x,'video.cover.url_list.0','cover','coverUrl','cover_url') || '', channelName:pick(x,'author.nickname','authorName','nickname') || '', channelUrl:su ? `https://www.douyin.com/user/${su}` : '',
+      followers:num(x,'author.follower_count','author.followerCount','authorFollowers'), publishedAt:iso(pick(x,'create_time','createTime','createTimeISO','publishTime')), durationSec:d,
+      views:num(x,'statistics.play_count','playCount','viewCount'), likes:num(x,'statistics.digg_count','diggCount','likeCount','likes'), comments:num(x,'statistics.comment_count','commentCount','comments') };
+    if (it.views === 0 && it.likes > 0) it.views = null; return it; },
+};
+const normC = x => ({ text:pick(x,'text','comment','content') || '', likes:num(x,'diggCount','likesCount','likeCount','digg_count') || 0, author:pick(x,'uniqueId','ownerUsername','user.nickname','nickname','username') || '' });
+function ownerKey(x) {
+  const d = pick(x,'aweme_id','awemeId','videoId','postId','shortCode'); if (d) return String(d);
+  const s = JSON.stringify([x.videoWebUrl, x.postUrl, x.inputUrl, x.url, x.videoUrl, x.input]);
+  const m = s.match(/\/(?:p|reel|reels|tv)\/([A-Za-z0-9_-]+)/) || s.match(/\/video\/(\d+)/); return m ? m[1] : null;
+}
+async function searchApify(pf, o, token) {
+  const C = APIFY[pf], v = { q:o.q, tag:o.q.replace(/[#\s]+/g, ''), limit:o.limit, cpv:o.cpv }, seen = new Set();
+  let items = (await runActor(C.search[0], C.search[1](v), token)).filter(x => !x.error).map(NORM[pf]).filter(i => i.id && !seen.has(i.id) && seen.add(i.id));
+  if (o.days) items = items.filter(i => !i.publishedAt || new Date(i.publishedAt) >= Date.now() - o.days * 864e5);
+  if (o.short && pf === 'instagram') items = items.filter(i => !i._t || /video|reel|clips/i.test(i._t));
+  items = items.slice(0, o.limit);
+  if (pf === 'instagram' && items.length) {
+    try { const users = [...new Set(items.map(i => i.channelName).filter(Boolean))].slice(0, 100), mp = {};
+      for (const p of await runActor(C.profiles[0], C.profiles[1]({ users }), token)) mp[p.username] = num(p,'followersCount');
+      items.forEach(i => { if (mp[i.channelName] != null) i.followers = mp[i.channelName]; }); } catch (e) { o.warn.push('인스타 팔로워 조회 실패: ' + e.message); }
+  }
+  const cm = {};
+  if (o.scan && o.kws.length) {
+    const tg = items.filter(i => i.url && i.comments !== 0);
+    if (tg.length) try {
+      const k2 = {}; for (const t of tg) { cm[t.id] = []; k2[t.id] = t.id; if (t.sc) k2[t.sc] = t.id; const m = t.url.match(/\/video\/(\d+)/) || t.url.match(/\/(?:p|reel|reels|tv)\/([A-Za-z0-9_-]+)/); if (m) k2[m[1]] = t.id; }
+      for (const c of await runActor(C.comments[0], C.comments[1]({ ...v, urls:tg.map(t => t.url) }), token)) { const id = k2[ownerKey(c)] || (tg.length === 1 ? tg[0].id : null); if (id) cm[id].push(normC(c)); }
+    } catch (e) { o.warn.push(`${PF[pf]} 댓글 수집 실패: ${e.message}`); }
+  }
+  return items.map(({ _t, sc, ...i }) => finalize(i, cm[i.id] ?? null, o.kws));
+}
+
+// ===================== 데모 데이터 =====================
+function demo(pf, o) {
+  const P = ['무선 미니 청소기','자동 회전 선풍기','접이식 수납함','실리콘 주방 집게','휴대용 블렌더','차량용 방향제','고양이 자동 급식기','미니 제습기','LED 무드등','보풀 제거기'];
+  const I = ['이거 어디서 사요??','제품명 알려주세요 ㅠㅠ','링크 좀 주세요','와 대박 구매하고 싶다','얼마예요?','어디꺼에요?','哪里买的？'], N = ['ㅋㅋㅋㅋ 웃기다','음악 제목 뭔가요','좋아요 누르고 갑니다','광고인가요'];
+  const r = (a, b) => Math.floor(a + Math.random() * (b - a));
+  return Array.from({ length: Math.min(o.limit, 30) }, (_, i) => { const views = r(5e3, 5e6), likes = Math.round(views * (0.01 + Math.random() * 0.08)), lv = Math.random() < 0.35 ? 0 : Math.random();
+    const cs = Array.from({ length: r(20, 100) }, () => ({ text: Math.random() < lv * 0.5 ? I[r(0, I.length)] : N[r(0, N.length)], likes: r(0, 800), author: 'user' + r(100, 9999) }));
+    return finalize({ platform:pf, id:pf + i, url:'#', title:`[데모] ${o.q} ${P[i % 10]} 이거 진짜 신세계 ${i % 3 ? '' : '#광고 쿠팡파트너스 활동'}`, description:i % 2 ? '👉 https://link.coupang.com/demo' : '',
+      thumbnail:'', channelName:'데모채널' + r(1, 50), channelUrl:'#', followers:r(500, 3e6), publishedAt:new Date(Date.now() - r(1, 180) * 864e5).toISOString(), durationSec:r(8, 60),
+      views, likes, comments:Math.round(likes * (0.01 + Math.random() * 0.1)) }, o.scan ? cs : null, o.kws); });
+}
+
+// ===================== 화면 =====================
+const S = { items: [], key: 'views', dir: -1 };
+const fN = n => n == null || !isFinite(n) ? '-' : n >= 1e8 ? +(n / 1e8).toFixed(1) + '억' : n >= 1e4 ? +(n / 1e4).toFixed(1) + '만' : n.toLocaleString('ko-KR');
+const fP = r => r == null || !isFinite(r) ? '-' : (r * 100).toFixed(r < 0.1 ? 2 : 1) + '%';
+const fD = s => s ? new Date(s).toLocaleDateString('ko-KR', { year:'2-digit', month:'2-digit', day:'2-digit' }) : '-';
+const fA = s => { if (!s) return ''; const d = Math.floor((Date.now() - new Date(s)) / 864e5); return d < 1 ? '오늘' : d < 30 ? d + '일 전' : d < 365 ? Math.floor(d / 30) + '개월 전' : Math.floor(d / 365) + '년 전'; };
+const fT = s => s || s === 0 ? `${Math.floor(s / 60)}:${String(Math.round(s % 60)).padStart(2, '0')}` : '-';
+const kwList = () => $('#kw').value.split(/[,\n]/).map(s => s.trim()).filter(Boolean);
+const hl = (t, ks) => { let h = esc(t); for (const k of ks || []) h = h.replace(new RegExp(esc(k).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), m => `<mark>${m}</mark>`); return h; };
+const msg = (id, cls, html) => { let e = document.getElementById('m' + id); if (!e) { e = document.createElement('div'); e.id = 'm' + id; $('#st').append(e); } e.className = 'msg ' + cls; e.innerHTML = html; };
+
+const SAVE = ['q','lim','per','ord','reg','short','kw','scan','cpv','demo'];
+function save() { const s = { pf: $$('[name=pf]:checked').map(e => e.value) }; SAVE.forEach(id => { const e = $('#' + id); s[id] = e.type === 'checkbox' ? e.checked : e.value; }); localStorage.setItem('ssf', JSON.stringify(s)); }
+function load() { let s = {}; try { s = JSON.parse(localStorage.getItem('ssf') || '{}'); } catch {} SAVE.forEach(id => { if (s[id] != null) { const e = $('#' + id); e.type === 'checkbox' ? e.checked = s[id] : e.value = s[id]; } });
+  if (s.pf) $$('[name=pf]').forEach(e => e.checked = s.pf.includes(e.value)); if (!$('#kw').value) $('#kw').value = PRESETS.ko.join(', '); }
+
+async function search() {
+  const q = $('#q').value.trim(); if (!q) return $('#q').focus();
+  const pfs = $$('[name=pf]:checked').map(e => e.value); if (!pfs.length) return alert('플랫폼을 하나 이상 선택하세요.');
+  save(); const [region, lang] = $('#reg').value.split('|');
+  const base = { q, limit:+$('#lim').value, days:+$('#per').value, order:$('#ord').value, region, lang, short:$('#short').checked, kws:kwList(), scan:$('#scan').checked, cpv:+$('#cpv').value };
+  const yk = localStorage.getItem('ssf.yt') || '', ak = localStorage.getItem('ssf.ap') || '', isDemo = $('#demo').checked;
+  $('#st').innerHTML = ''; S.items = []; render(); $('#bGo').disabled = true;
+  await Promise.all(pfs.map(async pf => {
+    const t0 = Date.now(), o = { ...base, warn: [] };
+    msg(pf, '', `⏳ <b>${PF[pf]}</b> 수집 중…${pf !== 'youtube' && !isDemo ? ' (1~5분 걸릴 수 있어요)' : ''}`);
+    try {
+      const r = isDemo ? demo(pf, o) : pf === 'youtube' ? await searchYouTube(o, yk) : await searchApify(pf, o, ak);
+      S.items.push(...r); render();
+      msg(pf, o.warn.length ? 'warn' : 'ok', `✅ <b>${PF[pf]}</b> ${r.length}개 영상 · 구매의도 댓글 있는 영상 ${r.filter(i => i.matchCount).length}개 (${((Date.now() - t0) / 1000).toFixed(1)}초)` + o.warn.map(w => '<br>⚠️ ' + esc(w)).join(''));
+    } catch (e) {
+      const hint = e instanceof TypeError ? ' — 인터넷 연결 또는 키를 확인하세요.' : '';
+      msg(pf, 'err', `❌ <b>${PF[pf]}</b>: ${esc(e.message)}${hint}`);
+    }
+  }));
+  $('#bGo').disabled = false;
+}
+
+function list() {
+  const t = $('#fT').value.trim().toLowerCase(), v = +$('#fV').value || 0, f = +$('#fF').value || 0, x = +$('#fX').value || Infinity;
+  const L = S.items.filter(i => (!v || (i.views || 0) >= v) && (!f || (i.followers || 0) >= f) && (x === Infinity || i.followers == null || i.followers <= x)
+    && (!$('#fI').checked || i.matchCount) && (!$('#fS').checked || i.shopSignals.length)
+    && (!t || `${i.title} ${i.channelName} ${i.matchedComments.map(c => c.text).join(' ')}`.toLowerCase().includes(t)));
+  const val = i => S.key === 'publishedAt' ? (i.publishedAt ? +new Date(i.publishedAt) : null) : i[S.key];
+  return L.sort((a, b) => { const p = val(a), q = val(b); if (p == null) return q == null ? 0 : 1; if (q == null) return -1; return typeof p === 'string' ? S.dir * p.localeCompare(q) : S.dir * (p - q); });
+}
+
+function render() {
+  const L = list(), A = S.items, ks = kwList();
+  $('#res').classList.toggle('hid', !A.length); $('#sum').classList.toggle('hid', !A.length);
+  $$('th[data-k]').forEach(th => { th.classList.toggle('on', th.dataset.k === S.key); th.textContent = th.textContent.replace(/ [▲▼]$/, '') + (th.dataset.k === S.key ? (S.dir < 0 ? ' ▼' : ' ▲') : ''); });
+  const withI = A.filter(i => i.matchCount).length;
+  $('#sum').innerHTML = [['전체 영상', A.length, Object.keys(PF).map(p => [p, A.filter(i => i.platform === p).length]).filter(x => x[1]).map(([p, n]) => `${PF[p]} ${n}`).join(' · ')],
+    ['현재 필터 결과', L.length, ''], ['구매의도 댓글 있는 영상', withI, A.length ? fP(withI / A.length) : ''],
+    ['찾은 구매의도 댓글', A.reduce((s, i) => s + i.matchCount, 0), ''], ['쇼핑링크/광고 영상', A.filter(i => i.shopSignals.length).length, '쿠팡·스토어 링크, #광고 등']]
+    .map(([k, v, s]) => `<div><small>${k}</small><b>${v.toLocaleString()}</b><small>${esc(s)}</small></div>`).join('');
+  $('#tb').innerHTML = L.map((i, n) => { const c = i.matchedComments[0];
+    return `<tr data-id="${esc(i.platform + ':' + i.id)}"><td class="m">${n + 1}</td>
+    <td>${i.thumbnail ? `<img class="th" loading="lazy" referrerpolicy="no-referrer" src="${esc(i.thumbnail)}" onerror="this.style.visibility='hidden'">` : ''}</td>
+    <td><span class="b ${i.platform}">${PF[i.platform]}</span></td>
+    <td class="w"><a href="${esc(i.url)}" target="_blank">${esc((i.title || '(제목 없음)').slice(0, 200))}</a><div>${i.shopSignals.map(s => `<span class="tag">${esc(s)}</span>`).join('')}</div>
+      ${c ? `<div class="m">💬 ${hl(c.text.slice(0, 80), ks)} (👍${fN(c.likes)})</div>` : ''}</td>
+    <td>${i.channelUrl ? `<a href="${esc(i.channelUrl)}" target="_blank">${esc(i.channelName)}</a>` : esc(i.channelName)}</td>
+    <td class="n">${fN(i.followers)}</td><td>${fD(i.publishedAt)}<div class="m">${fA(i.publishedAt)}</div></td><td class="n">${fT(i.durationSec)}</td>
+    <td class="n"><b>${fN(i.views)}</b></td><td class="n">${fN(i.likes)}</td><td class="n">${fN(i.comments)}</td><td class="n">${fP(i.engagement)}</td>
+    <td class="n ${i.vpf >= 10 ? 'hot' : ''}">${i.vpf == null ? '-' : i.vpf.toFixed(i.vpf < 10 ? 1 : 0) + '배'}</td>
+    <td class="n"><span class="it ${i.matchCount ? '' : 'z'}" data-d>${i.commentsScanned == null ? '-' : i.matchCount}</span>${i.commentsScanned != null ? `<div class="m">/${i.commentsScanned}개 중</div>` : ''}</td>
+    <td class="n">${fP(i.intentRate)}</td></tr>`; }).join('');
+}
+
+function detail(i) {
+  $('#det').innerHTML = `<h2 style="margin-top:0"><span class="b ${i.platform}">${PF[i.platform]}</span> ${esc(i.title.slice(0, 120))}</h2>
+    <p class="hint">${esc(i.channelName)} · 구독자 ${fN(i.followers)} · ${fD(i.publishedAt)} · 조회 ${fN(i.views)} · 좋아요 ${fN(i.likes)} · 댓글 ${fN(i.comments)} · <a href="${esc(i.url)}" target="_blank">영상 열기 ↗</a></p>
+    ${i.description ? `<div class="hint" style="white-space:pre-wrap;background:#f8f9fb;padding:8px;border-radius:8px;max-height:140px;overflow:auto">${esc(i.description.slice(0, 1000))}</div>` : ''}
+    <h3>구매의도 댓글 ${i.matchCount}개 <small class="m">(스캔 ${i.commentsScanned}개 · 좋아요순)</small></h3>
+    <div class="cms">${i.matchedComments.map(c => `<div class="cm">${hl(c.text, c.keywords)}<div class="m">👍 ${fN(c.likes)} · ${esc(c.author)} ${c.keywords.map(k => `<span class="tag k">${esc(k)}</span>`).join('')}</div></div>`).join('') || '<div class="cm m">없음</div>'}</div>`;
+  $('#dDet').showModal();
+}
+
+function csv() {
+  const C = [['플랫폼', i => PF[i.platform]], ['제목', i => i.title], ['URL', i => i.url], ['채널', i => i.channelName], ['채널URL', i => i.channelUrl], ['구독자/팔로워', i => i.followers],
+    ['업로드일', i => i.publishedAt?.slice(0, 10)], ['길이(초)', i => i.durationSec], ['조회수', i => i.views], ['좋아요', i => i.likes], ['댓글수', i => i.comments],
+    ['참여율(%)', i => i.engagement != null ? (i.engagement * 100).toFixed(2) : ''], ['떡상지수', i => i.vpf != null ? i.vpf.toFixed(2) : ''],
+    ['스캔댓글수', i => i.commentsScanned], ['구매의도댓글수', i => i.matchCount], ['구매의도율(%)', i => i.intentRate != null ? (i.intentRate * 100).toFixed(2) : ''],
+    ['쇼핑신호', i => i.shopSignals.join(' / ')], ['구매의도 댓글(상위10)', i => i.matchedComments.slice(0, 10).map(c => `[👍${c.likes}] ${c.text}`).join(' | ')]];
+  const cell = v => { const s = v == null ? '' : String(v).replace(/\r?\n/g, ' '); return /[",]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
+  const txt = [C.map(c => c[0]).join(','), ...list().map(i => C.map(c => cell(c[1](i))).join(','))].join('\r\n');
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['\uFEFF' + txt], { type:'text/csv;charset=utf-8' }));
+  a.download = `숏폼쇼핑_${$('#q').value.trim() || 'result'}_${new Date().toISOString().slice(0, 10)}.csv`; a.click();
+}
+
+$('#bGo').onclick = search;
+$('#q').onkeydown = e => e.key === 'Enter' && search();
+$$('[data-p]').forEach(b => b.onclick = () => { $('#kw').value = b.dataset.p === 'x' ? '' : [...new Set([...kwList(), ...PRESETS[b.dataset.p]])].join(', '); save(); });
+$$('th[data-k]').forEach(th => th.onclick = () => { const k = th.dataset.k; if (S.key === k) S.dir *= -1; else { S.key = k; S.dir = ['title','channelName','platform'].includes(k) ? 1 : -1; } render(); });
+['#fT','#fV','#fF','#fX','#fI','#fS'].forEach(s => $(s).oninput = render);
+$('#tb').onclick = e => { if (!e.target.closest('[data-d]')) return; const id = e.target.closest('tr').dataset.id, i = S.items.find(x => x.platform + ':' + x.id === id); if (i && i.commentsScanned != null) detail(i); };
+$('#bCsv').onclick = csv;
+$('#bSet').onclick = () => { $('#kYt').value = localStorage.getItem('ssf.yt') || ''; $('#kAp').value = localStorage.getItem('ssf.ap') || ''; $('#dSet').showModal(); };
+$('#bSave').onclick = () => { localStorage.setItem('ssf.yt', $('#kYt').value.trim()); localStorage.setItem('ssf.ap', $('#kAp').value.trim()); };
+load();
+</script>
+</body>
+</html>
